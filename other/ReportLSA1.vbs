@@ -7,32 +7,32 @@ Dim oMyStyle
 Dim OApplication, ODesktop, ODocument, srcFile, srcProps() ' ******************
 Dim args(0)
 
-FDir="\\129.186.1.24\holdingswap\03 ЗАВЕДУЮЩИЕ\Отчёты Росздрав\"      ' Путь, где смотреть Документы с сайта в формате Excel
-FDirOut="C:\braki\"   ' Путь куда выкладывать файл с отчетом
-TemplateFile="C:\braki\ReportLSA1.ots" ' Файл с шаблоном отчета
+FDir="\\129.186.1.24\holdingswap\03 Р—РђР’Р•Р”РЈР®Р©РР•\РћС‚С‡С‘С‚С‹ Р РѕСЃР·РґСЂР°РІ\"      ' РџСѓС‚СЊ, РіРґРµ СЃРјРѕС‚СЂРµС‚СЊ Р”РѕРєСѓРјРµРЅС‚С‹ СЃ СЃР°Р№С‚Р° РІ С„РѕСЂРјР°С‚Рµ Excel
+FDirOut="C:\braki\"   ' РџСѓС‚СЊ РєСѓРґР° РІС‹РєР»Р°РґС‹РІР°С‚СЊ С„Р°Р№Р» СЃ РѕС‚С‡РµС‚РѕРј
+TemplateFile="C:\braki\ReportLSA1.ots" ' Р¤Р°Р№Р» СЃ С€Р°Р±Р»РѕРЅРѕРј РѕС‚С‡РµС‚Р°
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 Set FLD = FSO.GetFolder(FDir)
 Set FL = FLD.Files
 
-C=Chr(34) ' Двойные кавычки для строк
+C=Chr(34) ' Р”РІРѕР№РЅС‹Рµ РєР°РІС‹С‡РєРё РґР»СЏ СЃС‚СЂРѕРє
 
-MonthYear=InputBox("Введите месяц. Пример: март","Введите месяц")
+MonthYear=InputBox("Р’РІРµРґРёС‚Рµ РјРµСЃСЏС†. РџСЂРёРјРµСЂ: РјР°СЂС‚","Р’РІРµРґРёС‚Рµ РјРµСЃСЏС†")
 
 '********************************************************
-'создаем новый ServiceManager
+'СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№ ServiceManager
 Set oServiceManager = CreateObject("com.sun.star.ServiceManager")
 Set oCalcDoc = oServiceManager.createInstance("com.sun.star.frame.Desktop")
-' создаем новую книгу OpenOffice.org Calc
+' СЃРѕР·РґР°РµРј РЅРѕРІСѓСЋ РєРЅРёРіСѓ OpenOffice.org Calc
 Set args(0) = oServiceManager.Bridge_GetStruct("com.sun.star.beans.PropertyValue")
 '	Set args(0) = createStruct("com.sun.star.beans.PropertyValue")
 args(0).Name = "AsTemplate"
 args(0).Value = True
 Set oBook = oCalcDoc.loadComponentFromURL("file:///"&TemplateFile, "_blank", 0, args)
-'получаем ссылку на второй!!!!!!!!!!!!!!!! лист новой книги
+'РїРѕР»СѓС‡Р°РµРј СЃСЃС‹Р»РєСѓ РЅР° РІС‚РѕСЂРѕР№!!!!!!!!!!!!!!!! Р»РёСЃС‚ РЅРѕРІРѕР№ РєРЅРёРіРё
 Set oSheet = oBook.getSheets().getByIndex(1)
-' т.е. чтобы получить ячейку в первом столбце первой строки пишем oSheet.getCellByPosition(0,0)
-'кроме того в getCellByPosition первый аргумент столбец, второй строка (в Excel наоборот)
+' С‚.Рµ. С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ СЏС‡РµР№РєСѓ РІ РїРµСЂРІРѕРј СЃС‚РѕР»Р±С†Рµ РїРµСЂРІРѕР№ СЃС‚СЂРѕРєРё РїРёС€РµРј oSheet.getCellByPosition(0,0)
+'РєСЂРѕРјРµ С‚РѕРіРѕ РІ getCellByPosition РїРµСЂРІС‹Р№ Р°СЂРіСѓРјРµРЅС‚ СЃС‚РѕР»Р±РµС†, РІС‚РѕСЂРѕР№ СЃС‚СЂРѕРєР° (РІ Excel РЅР°РѕР±РѕСЂРѕС‚)
 '***************************************************************************************************************************************
 
 xlsFiles=0
@@ -40,7 +40,7 @@ xlsStrs=0
 n=0
 startcol=10	   
 For Each FF in FL
-  if (InStr(LCase(FF.Name),LCase(MonthYear) & " лс.xls")) then
+  if (InStr(LCase(FF.Name),LCase(MonthYear) & " Р»СЃ.xls")) then
     Set xlglob = CreateObject("com.sun.star.ServiceManager") 
     Set Desktop = xlglob.createInstance("com.sun.star.frame.Desktop")
     Set Document = Desktop.LoadComponentFromURL("file:///"&FDir&FF.Name, "_blank", 0, mass )
@@ -48,38 +48,38 @@ For Each FF in FL
     Set xlWbk = sheets.getByIndex(0)
     k=0
     
-    while xlWbk.getCellByPosition(0,k).String<>"ТН"
+    while xlWbk.getCellByPosition(0,k).String<>"РўРќ"
       k=k+1
     wend
     k=k+1
     'n=n+1
-    'while Len(Trim(xlWbk.getCellByPosition(0,k).String))>0       ' Пока содержимое первой ячейки текущей строки непустое, берем данные
-     while Len(Trim(xlWbk.getCellByPosition(2,k).String))>0       ' Пока содержимое первой ячейки текущей строки непустое, берем данные
+    'while Len(Trim(xlWbk.getCellByPosition(0,k).String))>0       ' РџРѕРєР° СЃРѕРґРµСЂР¶РёРјРѕРµ РїРµСЂРІРѕР№ СЏС‡РµР№РєРё С‚РµРєСѓС‰РµР№ СЃС‚СЂРѕРєРё РЅРµРїСѓСЃС‚РѕРµ, Р±РµСЂРµРј РґР°РЅРЅС‹Рµ
+     while Len(Trim(xlWbk.getCellByPosition(2,k).String))>0       ' РџРѕРєР° СЃРѕРґРµСЂР¶РёРјРѕРµ РїРµСЂРІРѕР№ СЏС‡РµР№РєРё С‚РµРєСѓС‰РµР№ СЃС‚СЂРѕРєРё РЅРµРїСѓСЃС‚РѕРµ, Р±РµСЂРµРј РґР°РЅРЅС‹Рµ
  
 '      if InStr(xlWbk.getCellByPosition(7,k).String,":")>0 then
 '        LetLab = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),1,InStr(xlWbk.getCellByPosition(8,k).String,":")-1)
 '      else
 '        LetLab = ""
 '      end if
-      'LetNum = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(8,k).String,"№")+2,InStr(xlWbk.getCellByPosition(7,k).String," от")-InStr(xlWbk.getCellByPosition(7,k).String,"№")-2)
-      'LetDate = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(7,k).String,"от ")+3,8)
+      'LetNum = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(8,k).String,"в„–")+2,InStr(xlWbk.getCellByPosition(7,k).String," РѕС‚")-InStr(xlWbk.getCellByPosition(7,k).String,"в„–")-2)
+      'LetDate = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(7,k).String,"РѕС‚ ")+3,8)
       'x1 = Mid(LetDate,1,InStr(LetDate,"."))
       'LetDate = Mid(LetDate,InStr(LetDate,".")+1,Len(LetDate))
       'x2 = Mid(LetDate,1,InStr(LetDate,"."))
       'LetDate = Mid(LetDate,InStr(LetDate,".")+1,Len(LetDate))
       'LetDate = x1 & x2 & "20" & LetDate
 
-'MsgBox "file:///"&FDir&FF.Name 'Для отладки     
+'MsgBox "file:///"&FDir&FF.Name 'Р”Р»СЏ РѕС‚Р»Р°РґРєРё     
 '*******'
 Call oSheet.getCellByPosition(0, startcol+n).SetFormula(1+n)
-Call oSheet.getCellByPosition(1, startcol+n).SetFormula(Mid(Replace("Письмо ФСН " & xlWbk.getCellByPosition(8,k).String,C,"'"),1,200))
+Call oSheet.getCellByPosition(1, startcol+n).SetFormula(Mid(Replace("РџРёСЃСЊРјРѕ Р¤РЎРќ " & xlWbk.getCellByPosition(8,k).String,C,"'"),1,200))
 'Call oSheet.getCellByPosition(1, startcol+n).SetFormula(LetNum)
 Call oSheet.getCellByPosition(2, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(0,k).String & ", " & xlWbk.getCellByPosition(1,k).String,C,"'"),1,200))
 Call oSheet.getCellByPosition(3, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(2,k).String,C,"'"),1,200))
 Call oSheet.getCellByPosition(4, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(3,k).String,C,"'"),1,200) & ", " & Mid(Replace(xlWbk.getCellByPosition(4,k).String,C,"'"),1,200))
-Call oSheet.getCellByPosition(5, startcol+n).SetFormula("ИП Коростеленко М.Е.")
+Call oSheet.getCellByPosition(5, startcol+n).SetFormula("РРџ РљРѕСЂРѕСЃС‚РµР»РµРЅРєРѕ Рњ.Р•.")
 Call oSheet.getCellByPosition(7, startcol+n).SetFormula("0")
-Call oSheet.getCellByPosition(8, startcol+n).SetFormula("Не выявлено")
+Call oSheet.getCellByPosition(8, startcol+n).SetFormula("РќРµ РІС‹СЏРІР»РµРЅРѕ")
 Call oSheet.Rows.insertByIndex(startcol+n+1, 1)
 'Call oSheet.getCellByPosition(8, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),1,200))
 '*******'
@@ -93,54 +93,54 @@ Call oSheet.Rows.insertByIndex(startcol+n+1, 1)
     SET Document = Nothing
     SET Desktop = Nothing
     SET xlglob = Nothing
-  '  FSO.DeleteFile FDir&FF.Name		' Удаляем обработанный файл
+  '  FSO.DeleteFile FDir&FF.Name		' РЈРґР°Р»СЏРµРј РѕР±СЂР°Р±РѕС‚Р°РЅРЅС‹Р№ С„Р°Р№Р»
     xlsFiles = xlsFiles+1
   end if
 Next
 
- ' Заполняем месяц
+ ' Р—Р°РїРѕР»РЅСЏРµРј РјРµСЃСЏС†
  'ar1=Split(MonthYear,".")
  'select case CInt(ar1(0))
- ' case 1 MonthYear=" январь"
- ' case 2 MonthYear=" февраль"
- ' case 3 MonthYear=" март"
- ' case 4 MonthYear=" апрель"
- ' case 5 MonthYear=" май"
- ' case 6 MonthYear=" июнь"
- ' case 7 MonthYear=" июль"
- ' case 8 MonthYear=" август"
- ' case 9 MonthYear=" сентябрь"
- ' case 10 MonthYear=" октябрь"
- ' case 11 MonthYear=" ноябрь"
- ' case 12 MonthYear=" декабрь"
+ ' case 1 MonthYear=" СЏРЅРІР°СЂСЊ"
+ ' case 2 MonthYear=" С„РµРІСЂР°Р»СЊ"
+ ' case 3 MonthYear=" РјР°СЂС‚"
+ ' case 4 MonthYear=" Р°РїСЂРµР»СЊ"
+ ' case 5 MonthYear=" РјР°Р№"
+ ' case 6 MonthYear=" РёСЋРЅСЊ"
+ ' case 7 MonthYear=" РёСЋР»СЊ"
+ ' case 8 MonthYear=" Р°РІРіСѓСЃС‚"
+ ' case 9 MonthYear=" СЃРµРЅС‚СЏР±СЂСЊ"
+ ' case 10 MonthYear=" РѕРєС‚СЏР±СЂСЊ"
+ ' case 11 MonthYear=" РЅРѕСЏР±СЂСЊ"
+ ' case 12 MonthYear=" РґРµРєР°Р±СЂСЊ"
  'end select
  
  'Call oSheet.getCellByPosition(6, 6).SetFormula(MonthYear)
- MonthYear=" "&LCase(MonthYear)&" месяц "
+ MonthYear=" "&LCase(MonthYear)&" РјРµСЃСЏС† "
  'if Len(ar1(1))=2 then
  '  MonthYear=MonthYear&"20"
  'end if
- MonthYear=MonthYear&Year(Now)&" г."
+ MonthYear=MonthYear&Year(Now)&" Рі."
  Call oSheet.getCellByPosition(6, 6).SetFormula(MonthYear)
  '-------------------------------------------------------------
-'применение созданного выше стиля "osmorStyle" для форматирования
-'диапазона ячеек "K1:L10"
-'ссылку на диапазона получаем по имени методом getCellRangeByName
+'РїСЂРёРјРµРЅРµРЅРёРµ СЃРѕР·РґР°РЅРЅРѕРіРѕ РІС‹С€Рµ СЃС‚РёР»СЏ "osmorStyle" РґР»СЏ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ
+'РґРёР°РїР°Р·РѕРЅР° СЏС‡РµРµРє "K1:L10"
+'СЃСЃС‹Р»РєСѓ РЅР° РґРёР°РїР°Р·РѕРЅР° РїРѕР»СѓС‡Р°РµРј РїРѕ РёРјРµРЅРё РјРµС‚РѕРґРѕРј getCellRangeByName
 '-------------------------------------------------------------   
     Set oCells = oSheet.getCellRangeByName("A1:L111")
     'Set oMyStyle = oBook.createInstance("com.sun.star.style.CellStyle")
     'Call oBook.getStyleFamilies().getByName("CellStyles").insertByName("osmorStyle", oMyStyle)
-   ' oMyStyle.CellBackColor = RGB(255, 220, 220) ' цвет фона
+   ' oMyStyle.CellBackColor = RGB(255, 220, 220) ' С†РІРµС‚ С„РѕРЅР°
     'oMyStyle.IsCellBackgroundTransparent = False
-   ' oMyStyle.CharColor = RGB(0, 0, 200) ' цвет  шрифта
-    'oMyStyle.CharWeight = 150 ' толщина шрифта
+   ' oMyStyle.CharColor = RGB(0, 0, 200) ' С†РІРµС‚  С€СЂРёС„С‚Р°
+    'oMyStyle.CharWeight = 150 ' С‚РѕР»С‰РёРЅР° С€СЂРёС„С‚Р°
     'Set oCells = oSheet.getCellRangeByName("A1:L111")
-    'oCells.CellStyle = "osmorStyle" ' применяем стиль к выбранному диапазону
-    oCells.IsTextWrapped = True ' Переносить по словам
+    'oCells.CellStyle = "osmorStyle" ' РїСЂРёРјРµРЅСЏРµРј СЃС‚РёР»СЊ Рє РІС‹Р±СЂР°РЅРЅРѕРјСѓ РґРёР°РїР°Р·РѕРЅСѓ
+    oCells.IsTextWrapped = True ' РџРµСЂРµРЅРѕСЃРёС‚СЊ РїРѕ СЃР»РѕРІР°Рј
     'Set oMyStyle = Nothing
 
 if xlsStrs=0 then
-  MsgBox "Обработано " & xlsFiles & " файлов!"
+  MsgBox "РћР±СЂР°Р±РѕС‚Р°РЅРѕ " & xlsFiles & " С„Р°Р№Р»РѕРІ!"
 else
-  MsgBox "Обработано " & xlsFiles & " файлов! Получено " & xlsStrs & " позиций!" & Chr(13) & "Отправьте файл в РосЗдрав!"    ' Вывод сообщения о завершении
+  MsgBox "РћР±СЂР°Р±РѕС‚Р°РЅРѕ " & xlsFiles & " С„Р°Р№Р»РѕРІ! РџРѕР»СѓС‡РµРЅРѕ " & xlsStrs & " РїРѕР·РёС†РёР№!" & Chr(13) & "РћС‚РїСЂР°РІСЊС‚Рµ С„Р°Р№Р» РІ Р РѕСЃР—РґСЂР°РІ!"    ' Р’С‹РІРѕРґ СЃРѕРѕР±С‰РµРЅРёСЏ Рѕ Р·Р°РІРµСЂС€РµРЅРёРё
 end if  
