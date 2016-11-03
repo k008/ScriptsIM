@@ -1,5 +1,5 @@
 Option explicit
-On Error Resume Next
+'On Error Resume Next
 Dim FSO,Sep,FDir,FLD,ArrayInp,FF,FL,St
 Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfConn,ZV
@@ -78,7 +78,7 @@ For Each FF in FL
 next
    
 dbfPrice = null
-dbfSum = null
+'dbfSum = null
 dbfConn = null
 DeviceOut = null
 CopyFiles()

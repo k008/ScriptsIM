@@ -52,7 +52,7 @@ For Each FF in FL
   dbfPrice.Open "SELECT * FROM ["&TableName&"]"
   dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM ["&TableName&"]"
   ' St= Year(Now)&TableName&Sep & Date & Sep & dbfSum("Summ")
-  St= TableName&Sep & Date & Sep & dbfSum("Summ")
+  St= dbfPrice.Fields("NUMDOC")&Sep & dbfPrice.Fields("DATEDOC") & Sep & dbfSum("Summ")
   
    Set DeviceOut = FSO.CreateTextFile(FDir&"\"&TableName&"."&OutExt, True)
    DeviceOut.WriteLine "[Header]"

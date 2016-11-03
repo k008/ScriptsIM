@@ -51,7 +51,7 @@ For Each FF in FL
   'dbfPrice.MoveNext
   
     Do While Not dbfPrice.Eof
-   St=dbfPrice.Fields("CODEPST") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("FIRM") & Sep & dbfPrice.Fields("CNTR") & Sep &dbfPrice.Fields("QNT") & Sep & dbfPrice.Fields("PRICE2") & Sep & Sep & dbfPrice.Fields("PRICE1") & Sep & Sep & Sep & Sep & dbfPrice.Fields("NUMGTD") & Sep & dbfPrice.Fields("SERTIF") & Sep & dbfPrice.Fields("SER") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("EAN13") & Sep & Sep & Sep & Sep & dbfPrice.Fields("PRICE2")*dbfPrice.Fields("QNT") & Sep & Sep
+   St=dbfPrice.Fields("CODEPST") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("FIRM") & Sep & dbfPrice.Fields("CNTR") & Sep &dbfPrice.Fields("QNT") & Sep & dbfPrice.Fields("PRICE1") & Sep & Sep & dbfPrice.Fields("PRICE2N") & Sep & Sep & dbfPrice.Fields("NDS") &Sep & Sep & dbfPrice.Fields("NUMGTD") & Sep & dbfPrice.Fields("SERTIF") & Sep & dbfPrice.Fields("SER") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("EAN13") & Sep & Sep & Sep & Sep & dbfPrice.Fields("PRICE2")*dbfPrice.Fields("QNT") & Sep & Sep
       if Err.Number then Exit Do 
       St=Convert866to1251(St)
 	  DeviceOut.WriteLine (St)

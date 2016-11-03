@@ -9,7 +9,7 @@ Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,14
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
 Const OutExt="stv"
-Const OutPath="X:\Programs\In\"
+Const OutPath="X:\Programs\in\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 'FDir=GetParm()
@@ -44,14 +44,14 @@ For Each FF in FL
   ZV = 0
 
   dbfPrice.Open "SELECT * FROM "&TableName  'файл с накладной
-  dbfSum.Open "SELECT Sum(KOL*PRICE) AS Summ FROM "&TableName 'запрос на расчет суммы по накладной
-  St=dbfPrice.Fields("NUMBER") & Sep & dbfPrice.Fields("DATE") & Sep & dbfSum("Summ")
+  dbfSum.Open "SELECT Sum(SPRICENDS) AS Summ FROM "&TableName 'запрос на расчет суммы по накладной
+  St=dbfPrice.Fields("DOCNUM") & Sep & dbfPrice.Fields("DOCDATE") & Sep & dbfSum("Summ")
   St=Convert866to1251(St)
   DeviceOut.WriteLine(St)
   DeviceOut.WriteLine "[Body]"
   
     Do While Not dbfPrice.Eof
-       St=dbfPrice.Fields("ID") & Sep & dbfPrice.Fields("NAME") & Sep & Sep & dbfPrice.Fields("STRANA") & Sep & dbfPrice.Fields("KOL") & Sep & dbfPrice.Fields("PRICE") & Sep & Sep & dbfPrice.Fields("PRICE")*100/(dbfPrice.Fields("NDS")+100) & Sep & Sep & "0" & Sep & Sep & dbfPrice.Fields("GTD") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("SHTRIH") & Sep & Sep & Sep & Sep & dbfPrice.Fields("PRICE")*dbfPrice.Fields("KOL") & Sep
+       St=dbfPrice.Fields("CODE") & Sep & dbfPrice.Fields("GOODE") & Sep & dbfPrice.Fields("PRODUSER") & Sep & dbfPrice.Fields("COUNTRY") & Sep & dbfPrice.Fields("QUANT") & Sep & dbfPrice.Fields("PRICE") & Sep & Sep & dbfPrice.Fields("PRICE2") & Sep & Sep & "0" & Sep & Sep & dbfPrice.Fields("GTD") & Sep & dbfPrice.Fields("SERIAL") & "^" & dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("D_SERTIF") & Sep & dbfPrice.Fields("SERIAL") & Sep & Sep & dbfPrice.Fields("DATEB") & Sep & dbfPrice.Fields("EAN13") & Sep & Sep & Sep & Sep & dbfPrice.Fields("SPRICE") & Sep
           if Err.Number then Exit Do 
           St=Convert866to1251(St)
 	  DeviceOut.WriteLine (St)

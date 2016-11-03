@@ -1,8 +1,9 @@
 Option explicit
-On Error Resume Next
+'On Error Resume Next
 Dim FSO,Sep,FDir,FLD,ArrayInp,FF,FL,St
 Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfSum,dbfConn,ZV
+Dim Pb1, Pb2, Pb3, Pb4, Pb5, Pb6, Pb7, Pb8, Pb9, Pb10, Pb11, Pb12, Pb13, Pb14, Pb15, Pb16, Pb17, Pb18, Pb19, Pb20, Pb21, Pb22
 
 ReDim ConvTable(1)
 Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255"
@@ -17,6 +18,7 @@ ArrayInp=Split(FDir,";")
 FDir=ArrayInp(0)
 Set FLD = FSO.GetFolder(FDir)
 Set FL = FLD.Files
+
 For Each FF in FL
  if InStr(LCase(FF.Name),"."&InExt) then
    if InStr(FF.Name,"_") then
@@ -32,8 +34,8 @@ Set FL = FLD.Files
 
 For Each FF in FL
  if InStr(LCase(FF.Name),"."&InExt) then
-
   TableName=Mid(LCase(FF.Name),1,InStr(LCase(FF.Name),"."&InExt)-1)
+  CheckLenTableName()
   Set DeviceOut = FSO.CreateTextFile(FDir&"\"&TableName&"."&OutExt, True)
   Set dbfConn = CreateObject("ADODB.Connection")
   With dbfConn
@@ -50,27 +52,43 @@ For Each FF in FL
 
 
   DeviceOut.WriteLine "[Header]"
-  Sep = ";"
   
-  Dim LenFF, FFNew, FFNewTrim
-  LenFF=Len(FF)
-  If Instr(LenFF-7,FF,"-") <> 0 Then
-    FFNewTrim=Left(FF,LenFF-8)
-    FFNew=FFNewTrim & ".dbf"
-    FF.Move (FFNew) 
-    FF=FFNew
-  End If
-
+  Sep = ";"
   dbfPrice.Open "SELECT * FROM ["&TableName&"]"
-  dbfSum.Open "SELECT Sum((PRICE2N+(PRICE2N)/100*(NDS))*(QNT)) AS Summ FROM ["&TableName&"]" 
-  St=dbfPrice.Fields("NDOC") & Sep & dbfPrice.Fields("DATEDOC") & Sep & dbfSum("Summ")
-  'St=Convert866to1251(St)
+  'dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM ["&TableName&"]" 
+  St=dbfPrice.Fields("NDOC") & Sep & dbfPrice.Fields("DATEDOC") & Sep & dbfPrice.Fields("SMSDSDOC")
+  St=Convert866to1251(St)
   DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
       
     Do While Not dbfPrice.Eof
-    St=dbfPrice("CODEPST") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("FIRM") & Sep & dbfPrice.Fields("CNTR") & Sep &dbfPrice.Fields("QNT") & Sep & dbfPrice.Fields("PRICE2") & Sep & dbfPrice.Fields("PRICE1N") & Sep & dbfPrice.Fields("PRICE2N") & Sep & Sep & Sep & Sep & dbfPrice.Fields("NUMGTD") & Sep & dbfPrice.Fields("CERTIF") & "^" & dbfPrice.Fields("CERTORG")& "^" & dbfPrice.Fields("CERTDATE") & Sep & dbfPrice.Fields("SER") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("EAN13") & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("REGPRC") & Sep & Sep & (dbfPrice.Fields("PRICE2N")+dbfPrice.Fields("PRICE2N")/100*dbfPrice.Fields("NDS"))*dbfPrice.Fields("QNT") & Sep & ""
-          'St=Convert866to1251(St)
+    Pb1=dbfPrice.Fields("CODE")
+    Pb2=dbfPrice.Fields("NAME")
+    Pb3=dbfPrice.Fields("PRODUCER")
+    Pb4=dbfPrice.Fields("CNTR")
+    Pb5=dbfPrice.Fields("QNT")
+    Pb6=dbfPrice.Fields("COSTSNDS")
+    Pb7=dbfPrice.Fields("COSTPWONDS")
+    Pb8=dbfPrice.Fields("COSTWONDS")
+    Pb9=""
+    Pb10=dbfPrice.Fields("NDS")
+    Pb11=""
+    Pb12=dbfPrice.Fields("GTD")
+    Pb13=dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("SERTDATE") & "^" & dbfPrice.Fields("SERTLAB") & "^" & dbfPrice.Fields("SERTEXP")
+    Pb14=dbfPrice.Fields("SERIA")
+    Pb15=""
+    Pb16=dbfPrice.Fields("GDATE")
+    Pb17=dbfPrice.Fields("EAN13")
+    Pb18=dbfPrice.Fields("DATEREG")
+    Pb19=dbfPrice.Fields("REGPRC")
+    Pb20=""
+    Pb21=dbfPrice.Fields("SUMSNDS")
+    Pb22=dbfPrice.Fields("GNVLS")
+    'msgbox(pb2 & " t=" & TableName)
+      St=Pb1 & Sep & Pb2 & Sep & Pb3 & Sep & Pb4 & Sep &_
+  	        Pb5 & Sep & Pb6 & Sep & Pb7 & Sep & Pb8 & Sep &_
+		Pb9 & Sep & Pb10 & Sep & Pb11 & Sep & Pb12 & Sep & Pb13 & Sep & Pb14 & Sep & Pb15 & Sep & Pb16 & Sep & Pb17 & Sep & Pb18 & Sep & Pb19 & Sep & Pb20 & Sep & Pb21 & Sep & Pb22
+          St=Convert866to1251(St)
           DeviceOut.WriteLine(St)
 	  dbfPrice.MoveNext
           if Err.Number then Exit Do 
@@ -134,8 +152,7 @@ Function Convert866to1251(St)
 End Function
 
 Function CopyFiles()
-
-
+Set FL = FLD.Files
 For Each FF in FL
   if InStr(LCase(FF.Name),"."&OutExt) then
     FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
@@ -144,4 +161,30 @@ For Each FF in FL
     FSO.DeleteFile FDir&FF.Name
   end if
 Next
+End Function
+
+Function DelBigName(LR)
+  Dim FFNew
+	If LR = "L" Then
+		TableName=Left(TableName, 8)
+	End If
+	If LR = "R" Then
+		TableName=Right(TableName, 8)
+	End If
+	FFNew=FDir & TableName & ".dbf"
+  'msgbox(FF & "--" & FFNew)
+  FF.Move (FFNew) 
+  'msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbg'")
+  'msgbox(TableName)
+End Function
+
+Function CheckLenTableName()
+
+  If Len(TableName)>8 Then
+    DelBigName("L")
+  End If
+  
+  If Len(TableName)>8 Then
+    msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbf'. Количество символов=" & Len(TableName) & Chr(13)&Chr(10) & "Будет крах, звонить 911 с корпоративного телефона")
+  End If
 End Function

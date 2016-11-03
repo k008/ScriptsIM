@@ -7,7 +7,7 @@ Dim mass()
 
 Const InExt="xls"
 Const OutExt="sbi"
-Const OutPath="C:\Mail\Programs\In\"
+Const OutPath="X:\Programs\In\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 'FDir=GetParm()

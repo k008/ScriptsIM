@@ -1,5 +1,5 @@
 Option explicit
-On Error Resume Next
+'On Error Resume Next
 Dim FSO,Sep,FDir,FLD,ArrayInp,FF,FL,St
 Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfSum,dbfConn,ZV
@@ -8,7 +8,7 @@ ReDim ConvTable(1)
 Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255"
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
-Const OutExt="sps"
+Const OutExt="sso"
 Const OutPath="X:\Programs\In\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
@@ -42,16 +42,15 @@ For Each FF in FL
   Sep = ";"
 
   dbfPrice.Open "SELECT * FROM "&TableName
-  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM "&TableName
-'  St=dbfPrice.Fields("NOM_DOC") & Sep & Mid(dbfPrice.Fields("DATE_DOC"),1,InStr(dbfPrice.Fields("DATE_DOC")," ")-1) & Sep & dbfSum("Summ")
-  St=dbfPrice.Fields("NOM_DOC") & Sep & dbfPrice.Fields("DATE_DOC") & Sep & dbfSum("Summ")
-  'St=Convert866to1251(St)
+  dbfSum.Open "SELECT Sum(SUMSNDS) AS Summ FROM "&TableName
+  St=dbfPrice.Fields("NUMBERN") & Sep & dbfPrice.Fields("DATAN") & Sep & dbfSum("Summ")
+  St=Convert866to1251(St)
   DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
       
     Do While Not dbfPrice.Eof
-	  St = dbfPrice("KOD") & Sep & dbfPrice.Fields("NAME_TOVAR") & Sep & dbfPrice.Fields("PROIZ") & Sep & dbfPrice.Fields("COUNTRY") & Sep & dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("PRICE") & Sep & dbfPrice.Fields("PRICE_M_WO") & Sep & dbfPrice.Fields("PRICE")-(dbfPrice.Fields("PRICE")*(dbfPrice.Fields("PCT_NDS")/100)) & Sep & Sep & Sep & Sep & dbfPrice.Fields("GTD") & Sep & dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("SERTORGAN") & "^" & dbfPrice.Fields("END_D") & "^" & dbfPrice.Fields("REGNUMBER") & Sep & dbfPrice.Fields("SERIA") & Sep & Sep & dbfPrice.Fields("SROK") & Sep & dbfPrice.Fields("BARCODE") & Sep & Sep & dbfPrice.Fields("GOS_R") & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & dbfPrice.Fields("ZV") & ""
-          'St=Convert866to1251(St)
+	  St = dbfPrice("CODE") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("PROIZV") & Sep & dbfPrice.Fields("COUNTRY") & Sep &dbfPrice.Fields("KOL") & Sep & dbfPrice.Fields("SUMSNDS") & Sep & Sep & dbfPrice.Fields("SUM") & Sep & Sep & Sep & Sep & dbfPrice.Fields("GTD") & Sep & dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("MSERT") & "^" & Sep & Sep & Sep & dbfPrice.Fields("SROKG") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("SUMSNDS") & Sep & ""
+          St=Convert866to1251(St)
           DeviceOut.WriteLine(St)
 	  dbfPrice.MoveNext
           if Err.Number then Exit Do 

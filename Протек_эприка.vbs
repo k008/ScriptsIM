@@ -8,13 +8,25 @@ ReDim ConvTable(1)
 Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255"
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
-Const OutExt="sps"
+Const OutExt="spr"
 Const OutPath="X:\Programs\In\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 FDir="C:\Mail\Invoice\"&Mid(WScript.ScriptName,1,InStr(LCase(WScript.ScriptName),".vbs")-1)&"\"
 ArrayInp=Split(FDir,";")
 FDir=ArrayInp(0)
+Set FLD = FSO.GetFolder(FDir)
+Set FL = FLD.Files
+For Each FF in FL
+ if InStr(LCase(FF.Name),"."&InExt) then
+   if InStr(FF.Name,"_") then
+     FSO.CopyFile FDir&FF.Name, FDir&Mid(FF.Name,1,InStr(FF.Name,"_")-1) & "." & InExt
+     FSO.DeleteFile FDir&FF.Name
+	end if
+ end if
+next
+Set FLD = Nothing
+SET FL = Nothing
 Set FLD = FSO.GetFolder(FDir)
 Set FL = FLD.Files
 
@@ -38,33 +50,39 @@ For Each FF in FL
 
 
   DeviceOut.WriteLine "[Header]"
-  
   Sep = ";"
+  
+  Dim LenFF, FFNew, FFNewTrim
+  LenFF=Len(FF)
+  If Instr(LenFF-7,FF,"-") <> 0 Then
+    FFNewTrim=Left(FF,LenFF-8)
+    FFNew=FFNewTrim & ".dbf"
+    FF.Move (FFNew) 
+    FF=FFNew
+  End If
 
-  dbfPrice.Open "SELECT * FROM "&TableName
-  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM "&TableName
-'  St=dbfPrice.Fields("NOM_DOC") & Sep & Mid(dbfPrice.Fields("DATE_DOC"),1,InStr(dbfPrice.Fields("DATE_DOC")," ")-1) & Sep & dbfSum("Summ")
-  St=dbfPrice.Fields("NOM_DOC") & Sep & dbfPrice.Fields("DATE_DOC") & Sep & dbfSum("Summ")
+  dbfPrice.Open "SELECT * FROM ["&TableName&"]"
+  dbfSum.Open "SELECT Sum((PRICE2N+(PRICE2N)/100*(NDS))*(QNT)) AS Summ FROM ["&TableName&"]" 
+  St=dbfPrice.Fields("NDOC") & Sep & dbfPrice.Fields("DATEDOC") & Sep & dbfSum("Summ")
   'St=Convert866to1251(St)
   DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
       
     Do While Not dbfPrice.Eof
-	  St = dbfPrice("KOD") & Sep & dbfPrice.Fields("NAME_TOVAR") & Sep & dbfPrice.Fields("PROIZ") & Sep & dbfPrice.Fields("COUNTRY") & Sep & dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("PRICE") & Sep & dbfPrice.Fields("PRICE_M_WO") & Sep & dbfPrice.Fields("PRICE")-(dbfPrice.Fields("PRICE")*(dbfPrice.Fields("PCT_NDS")/100)) & Sep & Sep & Sep & Sep & dbfPrice.Fields("GTD") & Sep & dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("SERTORGAN") & "^" & dbfPrice.Fields("END_D") & "^" & dbfPrice.Fields("REGNUMBER") & Sep & dbfPrice.Fields("SERIA") & Sep & Sep & dbfPrice.Fields("SROK") & Sep & dbfPrice.Fields("BARCODE") & Sep & Sep & dbfPrice.Fields("GOS_R") & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & dbfPrice.Fields("ZV") & ""
+    St=dbfPrice("CODEPST") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("FIRM") & Sep & dbfPrice.Fields("CNTR") & Sep &dbfPrice.Fields("QNT") & Sep & dbfPrice.Fields("PRICE2") & Sep & dbfPrice.Fields("PRICE1N") & Sep & dbfPrice.Fields("PRICE2N") & Sep & Sep & Sep & Sep & dbfPrice.Fields("NUMGTD") & Sep & dbfPrice.Fields("CERTIFBAD") & "^" & dbfPrice.Fields("CERDATEBAD") & "^" & dbfPrice.Fields("CERTIF") & "^" & dbfPrice.Fields("CERTORG") & "^" & dbfPrice.Fields("CERTDATE") & "^БАД^" & dbfPrice.Fields("CERTORGBAD") & "^" & Sep & dbfPrice.Fields("SER") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("EAN13") & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("REGPRC") & Sep & Sep & (dbfPrice.Fields("PRICE2N")+dbfPrice.Fields("PRICE2N")/100*dbfPrice.Fields("NDS"))*dbfPrice.Fields("QNT") & Sep & ""
           'St=Convert866to1251(St)
           DeviceOut.WriteLine(St)
 	  dbfPrice.MoveNext
           if Err.Number then Exit Do 
     Loop
 
-  dbfConn.Close   
   dbfPrice = null
   dbfSum = null
   dbfConn = null
   DeviceOut.close
   'если возникли ошибки то удалим созданный файл
    if Err.Number then
-    FSO.DeleteFile (FDir&"\"&TableName&"."&OutExt)
+    FSO.DeleteFile (FDir&"\"&TableName&"."&InExt)
     Dim FOut
     if not FSO.FileExists("error.log") then 
      Set FOut=FSO.CreateTextFile("error.log")
@@ -91,7 +109,7 @@ Function GetParm()
   DeviceInp.Close: Set DeviceInp = nothing
 End Function
 
-'------перекодировка из Dos в Windows
+'------прекодировка из Dos в Windows
 Sub MakeConvTable()
   Dim ArrT,ArrF,i
   ReDim ConvTable(256)
@@ -101,16 +119,6 @@ Sub MakeConvTable()
     ConvTable(ArrF(i))=Chr(ArrT(i))
   Next
 End Sub
-
-'Function ConvDate(D)
-'  if D<>"" then
-'   Dim St
-'   St=Split(D,".")
-'   ConvDate=Mid(St(2),3,2)+"."+St(1)+".20"+St(0)
-'  else
-'   ConvDate=""
-'  end if
-'End Function
 
 Function Convert866to1251(St)
   Dim A,i,Ch, StOut
@@ -126,7 +134,8 @@ Function Convert866to1251(St)
 End Function
 
 Function CopyFiles()
-Set FL = FLD.Files
+
+
 For Each FF in FL
   if InStr(LCase(FF.Name),"."&OutExt) then
     FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
@@ -135,12 +144,4 @@ For Each FF in FL
     FSO.DeleteFile FDir&FF.Name
   end if
 Next
-End Function
-
-Function ReplaceStr(Val,Old,NStr)
-  if IsNull(Val) then
-    ReplaceStr=Val
-  else
-    ReplaceStr=Replace(Val,Old,NStr)
-  end if
 End Function

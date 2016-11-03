@@ -10,7 +10,7 @@ Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,14
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
 Const OutExt="skt"
-Const OutPath= "C:\tmp\" '"X:\Programs\In\"
+Const OutPath= "X:\Programs\In\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 'FDir=GetParm()
@@ -163,6 +163,7 @@ Function CopyFiles()
 Set FL = FLD.Files
 For Each FF in FL
   if InStr(LCase(FF.Name),"."&OutExt) then
+  'msgbox(FDir&FF.Name & Chr(13)&Chr(10) & OutPath&FF.Name)
     FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
     FSO.DeleteFile FDir&FF.Name
   else
@@ -172,7 +173,7 @@ Next
 End Function
 
 Function DelBigName()
-  TableName=Mid(TableName, 2, Len(TableName))
+  TableName=Mid(TableName, 3, Len(TableName))
   FFNew=FDir & TableName & ".dbf"
   'msgbox(FF & "--" & FFNew)
   FF.Move (FFNew) 

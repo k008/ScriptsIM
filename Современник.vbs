@@ -9,7 +9,7 @@ Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,14
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
 Const OutExt="sso"
-Const OutPath="X:\Programs\In\"
+Const OutPath="X:\Programs\in\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 FDir="C:\Mail\Invoice\"&Mid(WScript.ScriptName,1,InStr(LCase(WScript.ScriptName),".vbs")-1)&"\"
@@ -42,15 +42,15 @@ For Each FF in FL
   Sep = ";"
 
   dbfPrice.Open "SELECT * FROM "&TableName
-  dbfSum.Open "SELECT Sum(SUMSNDS) AS Summ FROM "&TableName
-  St=dbfPrice.Fields("NUMBERN") & Sep & dbfPrice.Fields("DATAN") & Sep & dbfSum("Summ")
-  St=Convert866to1251(St)
+  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM "&TableName
+  St=dbfPrice.Fields("N_DOC") & Sep & dbfPrice.Fields("DATA_DOC") & Sep & dbfSum("Summ")
+  'St=Convert866to1251(St)
   DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
       
     Do While Not dbfPrice.Eof
-	  St = dbfPrice("CODE") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("PROIZV") & Sep & dbfPrice.Fields("COUNTRY") & Sep &dbfPrice.Fields("KOL") & Sep & dbfPrice.Fields("SUMSNDS") & Sep & Sep & dbfPrice.Fields("SUM") & Sep & Sep & Sep & Sep & dbfPrice.Fields("GTD") & Sep & dbfPrice.Fields("SERT") & "^" & dbfPrice.Fields("MSERT") & "^" & Sep & Sep & Sep & dbfPrice.Fields("SROKG") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("SUMSNDS") & Sep & ""
-          St=Convert866to1251(St)
+	  St = dbfPrice("KODTOV") & Sep & dbfPrice.Fields("NAMETOV") & Sep & dbfPrice.Fields("PROIZ") & Sep & Sep &dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("SUMMA")/(dbfPrice.Fields("KOLVO")) & Sep & Sep & dbfPrice.Fields("CENABEZNDS") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("REGN") & Sep & Sep & Sep & dbfPrice.Fields("SROK") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & ""
+          'St=Convert866to1251(St)
           DeviceOut.WriteLine(St)
 	  dbfPrice.MoveNext
           if Err.Number then Exit Do 
