@@ -39,7 +39,6 @@ xlsStrs=0
 n=0
 startcol=10
 For Each FF in FL
-    'msgbox FF.Name
     if (InStr(LCase(FF.Name),LCase(MonthYear) & " имн.xls")) then
         Set xlglob = CreateObject("com.sun.star.ServiceManager") 
         Set Desktop = xlglob.createInstance("com.sun.star.frame.Desktop")
