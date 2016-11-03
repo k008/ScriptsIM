@@ -1,11 +1,11 @@
 'Dim T1
 'T1=time
 Option explicit
-Dim ServerShare, LocalShare, ver, ServerMaptekaIn, ServerMaptekaFarm, PathPostA2, PathMailA2, PathPostG1, PathMailG1, PathPostG2, PathMailG2, PathPostADV, PathMailADV, PathPostPIR, PathMailPIR
-Public PathPost, PathMail, iWriteLog, iCheckPath
+Dim ServerShare, LocalShare, ver, ServerMaptekaIn, ServerMaptekaFarm, PathPostA2, PathMailA2, PathPostSKM1, PathMailSKM1, PathPostSKM2, PathMailSKM2, PathPostSKM3, PathMailSKM3, PathPostPIR, PathMailPIR
+Public PathPost, PathMail, iWriteLog, iCheckPath, NameFileLog
 iWriteLog=1
 iCheckPath=0
-ver="0.1.4"
+ver="0.1.5" 'ZAMENA UL
 
 'User = 
 'Password = 
@@ -18,15 +18,15 @@ PathPostA2="\\10.20.30.1\POST_Office"
 'PathPostA2="\\10.20.30.1\POST_A1\A2"
   'PathMailA2="\\PRIMERGY\Mail"
 
-PathPostG1="\\10.20.30.1\POST_Office"
+PathPostSKM1="\\10.20.30.1\POST_Office"
 'PathPostG1="\\10.20.30.1\POST_A1\G1"
   'PathMailG1="\\172.27.3.1\Mail_Prima"
 
-PathPostG2="\\10.20.30.1\POST_Office"
+PathPostSKM2="\\10.20.30.1\POST_Office"
 'PathPostG2="\\10.20.30.1\POST_A1\G2"
   'PathMailG2="C:\Mail"
 
-PathPostADV="\\10.20.30.1\POST_Office"
+PathPostSKM3="\\10.20.30.1\POST_Office"
 'PathPostADV="\\10.20.30.1\POST_A1\ADV"
   'PathMailADV="\\172.27.5.1\Mail"
 
@@ -53,7 +53,10 @@ WriteLog("Version:            " & ver)
 
 'Главная Ф-ИЯ
 CheckIP
-WriteLog("Exit.") 
+WriteLog("Exit")
+CheckLogSize
+WriteLog("Exit.")
+
 
 Sub MoveAllFiles(FDir,OutPath)
   Dim FSO,FLD,FL,FF, FDirStatus, OutPathStatus
@@ -66,6 +69,7 @@ Sub MoveAllFiles(FDir,OutPath)
   WriteLog("FDirStatus=" & FDirStatus)
   WriteLog("OutPathStatus=" & OutPathStatus)
     If FDirStatus And OutPathStatus Then
+      WriteLog("FDir=" & FDir & " OutPath=" & OutPath)
       WriteLog("Folders exists_moveallfiles")
 '      msgbox("1" & chr(10) & FDir & chr(10) & OutPath)
       Set FLD = FSO.GetFolder(FDir)
@@ -162,37 +166,37 @@ Dim strComputer, strNetworkConnection, objWMIService, colNics, objNic, colNicCon
       MoveAllFiles LocalShare & "out\", ServerShare & "A2\in\"
       
     Case "10.20.30.152"
-      PathPost=PathPostG1
+      PathPost=PathPostSKM1
         'PathMail=PathMailG1
       WriteLog("Case: 10.20.30.52")
         'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
         'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
         'A1-G1
-      MoveAllFiles ServerShare & "G1\out\", LocalShare & "in\"
+      MoveAllFiles ServerShare & "SKM1\out\", LocalShare & "in\"
         'G1-A1
-      MoveAllFiles LocalShare & "out\", ServerShare & "G1\in\"
+      MoveAllFiles LocalShare & "out\", ServerShare & "SKM1\in\"
         'G1-A1-G2
-      MoveAllFiles LocalShare & "G2\", ServerShare & "G2\out\"
+      'MoveAllFiles LocalShare & "G2\", ServerShare & "G2\out\"
         
     Case "10.20.30.201"
-      PathPost=PathPostG2
+      PathPost=PathPostSKM2
         'PathMail=PathMailG2
       WriteLog("Case: 10.20.30.201")
         'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
         'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
         'A1-G2
-      MoveAllFiles ServerShare & "G2\out\", LocalShare & "in\"
+      MoveAllFiles ServerShare & "SKM2\out\", LocalShare & "in\"
         'G2-A1-G1
-      MoveAllFiles LocalShare & "out\", ServerShare & "G1\out\"
+      'MoveAllFiles LocalShare & "out\", ServerShare & "G1\out\"
         'G2-A1
-      MoveAllFiles LocalShare & "of\", ServerShare & "G2\in\"
+      MoveAllFiles LocalShare & "out\", ServerShare & "SKM2\in\"
     
     Case "10.20.30.170"
-      PathPost=PathPostADV
+      PathPost=PathPostSKM
         'PathMail=PathMailADV
       WriteLog("Case: 10.20.30.170")
-      MoveAllFiles ServerShare & "ADV\out\", LocalShare & "in\"
-      MoveAllFiles LocalShare & "out\", ServerShare & "ADV\in\"
+      MoveAllFiles ServerShare & "SKM3\out\", LocalShare & "in\"
+      MoveAllFiles LocalShare & "out\", ServerShare & "SKM3\in\"
     
     Case "10.20.30.160"
       PathPost=PathPostPIR
@@ -220,7 +224,9 @@ End Sub
 Sub WriteLog(sData)
   Dim FSOL, FileLog, PathFileLog
   Set FSOL = CreateObject("Scripting.FileSystemObject")
-  PathFileLog="\MoveFilesPost.log"
+  NameFileLog=MoveFilesPost.log
+  PathFileLog="\" & NameFileLog
+  
   If FSOL.FileExists(LocalShare & PathFileLog) Then
     Set FileLog=FSOL.OpenTextFile(LocalShare & PathFileLog, 8)
   End If
@@ -288,4 +294,44 @@ Function FileExist(fFile)
       Else
         FileExist="0"
       End If
+End Function
+
+Function CheckLogSize
+  Dim FSOL1, FileLog, PathFileLog, LogFile, PathScript, PathFolderScript, LogSize
+  Set FSOL1 = CreateObject("Scripting.FileSystemObject")
+  PathFileLog="\" & NameFileLog
+  If FSOL1.FileExists(LocalShare & PathFileLog) Then
+    Set LogFile = FSOL1.GetFile(LocalShare & PathFileLog)
+    LogSize = LogFile.Size
+    MsgBox "Размер файла " & WScript.ScriptName & " : " & LogSize &" килобайт"
+    If LogSize >= 524288 Then
+          MsgBox "Размер Лога большой=" & LogSize
+          MoveLogFiles
+    End if
+  End If
+End Function
+
+Function MoveLogFiles
+  Dim FSO, countlog. ProgrammFiles
+  Set FSO = CreateObject("Scripting.FileSystemObject")
+  countlog=20
+  For i=1 To countlog
+    If FileExist(LocalShare & "\" NameFileLog & "." & i & ".zip") = 0 Then
+    FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
+    'Создать архив'
+    ProgrammFiles=EnvironmentVariables
+    ProgrammFiles
+      If i > countlog Then
+      'Удалить старый архив'
+        FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
+      End If
+      'Exit For
+    End If
+  Next
+End Function
+
+
+Function EnvironmentVariables(fvar)
+  Set WshShell = WScript.CreateObject("WScript.Shell")
+  EnvironmentVariables=WshShell.ExpandEnvironmentStrings(fvar)
 End Function
