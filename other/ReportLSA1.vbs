@@ -5,7 +5,6 @@ Dim Mass()
 Dim aNoArgs()
 Dim oMyStyle
 Dim OApplication, ODesktop, ODocument, srcFile, srcProps() ' ******************
-
 Dim args(0)
 
 FDir="\\129.186.1.24\holdingswap\03 ЗАВЕДУЮЩИЕ\Отчёты Росздрав\"      ' Путь, где смотреть Документы с сайта в формате Excel
@@ -41,7 +40,7 @@ xlsStrs=0
 n=0
 startcol=10	   
 For Each FF in FL
-  if (InStr(LCase(FF.Name),".xls") and InStr(LCase(FF.Name),LCase(MonthYear))>0) and InStr(LCase(FF.Name), "мед. изделия") <= 0 then
+  if (InStr(LCase(FF.Name),LCase(MonthYear) & " лс.xls")) then
     Set xlglob = CreateObject("com.sun.star.ServiceManager") 
     Set Desktop = xlglob.createInstance("com.sun.star.frame.Desktop")
     Set Document = Desktop.LoadComponentFromURL("file:///"&FDir&FF.Name, "_blank", 0, mass )
@@ -49,19 +48,19 @@ For Each FF in FL
     Set xlWbk = sheets.getByIndex(0)
     k=0
     
-    while xlWbk.getCellByPosition(3,k).String<>"Серия"
-      k=k+2
+    while xlWbk.getCellByPosition(0,k).String<>"ТН"
+      k=k+1
     wend
-    k=k+2
+    k=k+1
     'n=n+1
     'while Len(Trim(xlWbk.getCellByPosition(0,k).String))>0       ' Пока содержимое первой ячейки текущей строки непустое, берем данные
      while Len(Trim(xlWbk.getCellByPosition(2,k).String))>0       ' Пока содержимое первой ячейки текущей строки непустое, берем данные
  
-      if InStr(xlWbk.getCellByPosition(7,k).String,":")>0 then
-        LetLab = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),1,InStr(xlWbk.getCellByPosition(8,k).String,":")-1)
-      else
-        LetLab = ""
-      end if
+'      if InStr(xlWbk.getCellByPosition(7,k).String,":")>0 then
+'        LetLab = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),1,InStr(xlWbk.getCellByPosition(8,k).String,":")-1)
+'      else
+'        LetLab = ""
+'      end if
       'LetNum = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(8,k).String,"№")+2,InStr(xlWbk.getCellByPosition(7,k).String," от")-InStr(xlWbk.getCellByPosition(7,k).String,"№")-2)
       'LetDate = Mid(Replace(xlWbk.getCellByPosition(7,k).String,C,"'"),InStr(xlWbk.getCellByPosition(7,k).String,"от ")+3,8)
       'x1 = Mid(LetDate,1,InStr(LetDate,"."))
@@ -73,12 +72,12 @@ For Each FF in FL
 'MsgBox "file:///"&FDir&FF.Name 'Для отладки     
 '*******'
 Call oSheet.getCellByPosition(0, startcol+n).SetFormula(1+n)
-Call oSheet.getCellByPosition(1, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(1,k).String,C,"'"),1,200))
+Call oSheet.getCellByPosition(1, startcol+n).SetFormula(Mid(Replace("Письмо ФСН " & xlWbk.getCellByPosition(8,k).String,C,"'"),1,200))
 'Call oSheet.getCellByPosition(1, startcol+n).SetFormula(LetNum)
-Call oSheet.getCellByPosition(2, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(2,k).String,C,"'"),1,200))
-Call oSheet.getCellByPosition(3, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(3,k).String,C,"'"),1,200))
-Call oSheet.getCellByPosition(4, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(4,k).String,C,"'"),1,200) & ", " & Mid(Replace(xlWbk.getCellByPosition(3,k).String,C,"'"),1,200))
-Call oSheet.getCellByPosition(5, startcol+n).SetFormula("ИП Коростеленко М.Е., Аптека 1, М.Жукова, 5")
+Call oSheet.getCellByPosition(2, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(0,k).String & ", " & xlWbk.getCellByPosition(1,k).String,C,"'"),1,200))
+Call oSheet.getCellByPosition(3, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(2,k).String,C,"'"),1,200))
+Call oSheet.getCellByPosition(4, startcol+n).SetFormula(Mid(Replace(xlWbk.getCellByPosition(3,k).String,C,"'"),1,200) & ", " & Mid(Replace(xlWbk.getCellByPosition(4,k).String,C,"'"),1,200))
+Call oSheet.getCellByPosition(5, startcol+n).SetFormula("ИП Коростеленко М.Е.")
 Call oSheet.getCellByPosition(7, startcol+n).SetFormula("0")
 Call oSheet.getCellByPosition(8, startcol+n).SetFormula("Не выявлено")
 Call oSheet.Rows.insertByIndex(startcol+n+1, 1)
