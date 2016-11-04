@@ -42,16 +42,16 @@ WriteLog("Version:            " & ver)
 'WriteLog("OS:                 " & @OSVersion & " " & @OSArch)
 'WriteLog("User:               " & Who)
 
-  'server->заведующей
+  'server->Р·Р°РІРµРґСѓСЋС‰РµР№
 'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
-  'заведующая-сервер
+  'Р·Р°РІРµРґСѓСЋС‰Р°СЏ-СЃРµСЂРІРµСЂ
   'MoveAllFiles LocalShare & "in\", ServerMaptekaIn
-  'сервер->заведующая
+  'СЃРµСЂРІРµСЂ->Р·Р°РІРµРґСѓСЋС‰Р°СЏ
   'MoveAllFiles ServerMaptekaFarm, LocalShare & "out\"
-  'заведующей->server
+  'Р·Р°РІРµРґСѓСЋС‰РµР№->server
 'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
 
-'Главная Ф-ИЯ
+'Р“Р»Р°РІРЅР°СЏ Р¤-РРЇ
 CheckIP
 WriteLog("Exit")
 CheckLogSize
@@ -121,17 +121,17 @@ Sub CheckDrive(strDriveName, strRemoteShare)
   Set objNetwork = WScript.CreateObject("WScript.Network")
 
   If FSO.DriveExists(strDriveName) Then
-    WriteLog("Диск " & strDriveName & " уже подключен")
-    'Выводим информацию на экран
-    'WScript.Echo "Диск " & strDriveName & " уже подключен"
+    WriteLog("Р”РёСЃРє " & strDriveName & " СѓР¶Рµ РїРѕРґРєР»СЋС‡РµРЅ")
+    'Р’С‹РІРѕРґРёРј РёРЅС„РѕСЂРјР°С†РёСЋ РЅР° СЌРєСЂР°РЅ
+    'WScript.Echo "Р”РёСЃРє " & strDriveName & " СѓР¶Рµ РїРѕРґРєР»СЋС‡РµРЅ"
   Else
-    'Подключаем диск y:
-    WriteLog("Выполняется сетевое подключение сетевого диска: " & strDriveName)
+    'РџРѕРґРєР»СЋС‡Р°РµРј РґРёСЃРє y:
+    WriteLog("Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ СЃРµС‚РµРІРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ СЃРµС‚РµРІРѕРіРѕ РґРёСЃРєР°: " & strDriveName)
     objNetwork.MapNetworkDrive strDriveName, strRemoteShare
     iCheckPath="1"
-    WriteLog("Сетевой Диск: "& strDriveName & " Успешно подключен")
-    'Вывод информации на экран:
-    'WScript.Echo " Сетевой Диск: "& strDriveName & " Успешно подключен"
+    WriteLog("РЎРµС‚РµРІРѕР№ Р”РёСЃРє: "& strDriveName & " РЈСЃРїРµС€РЅРѕ РїРѕРґРєР»СЋС‡РµРЅ")
+    'Р’С‹РІРѕРґ РёРЅС„РѕСЂРјР°С†РёРё РЅР° СЌРєСЂР°РЅ:
+    'WScript.Echo " РЎРµС‚РµРІРѕР№ Р”РёСЃРє: "& strDriveName & " РЈСЃРїРµС€РЅРѕ РїРѕРґРєР»СЋС‡РµРЅ"
   End If
 End Sub
 
@@ -139,7 +139,7 @@ Sub CheckIP
 Dim strComputer, strNetworkConnection, objWMIService, colNics, objNic, colNicConfigs, objNicConfig, strIPAddress, OpenVPNIP
   WriteLog("Check IP...")
   strComputer  =  "."
-  ' отредактировать под нужное имя сетевого подключения:
+  ' РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїРѕРґ РЅСѓР¶РЅРѕРµ РёРјСЏ СЃРµС‚РµРІРѕРіРѕ РїРѕРґРєР»СЋС‡РµРЅРёСЏ:
   strNetworkConnection = "'OpenVPN'"
   Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
   Set colNics = objWMIService.ExecQuery("Select * From Win32_NetworkAdapter " _
@@ -215,7 +215,7 @@ Dim strComputer, strNetworkConnection, objWMIService, colNics, objNic, colNicCon
         MoveAllFiles ServerShare & "ALEX\out\", LocalShare & "in\"
         MoveAllFiles LocalShare & "out\", ServerShare & "ALEX\in\"
       End If
-    'завершить скрипт!
+    'Р·Р°РІРµСЂС€РёС‚СЊ СЃРєСЂРёРїС‚!
       'PathPost="Aquarius"
       'PathMail="Aquarius"
   End Select
@@ -280,7 +280,7 @@ Function CheckPath(Path)
       
       If Left(Path,2) = "D:" Then
         WriteLog("Folder: " & Path & " NOT Exist")
-        'проверить структуру локальной папки
+        'РїСЂРѕРІРµСЂРёС‚СЊ СЃС‚СЂСѓРєС‚СѓСЂСѓ Р»РѕРєР°Р»СЊРЅРѕР№ РїР°РїРєРё
       End If
     End If
     CheckPath=iCheckPath
@@ -303,9 +303,9 @@ Function CheckLogSize
   If FSOL1.FileExists(LocalShare & PathFileLog) Then
     Set LogFile = FSOL1.GetFile(LocalShare & PathFileLog)
     LogSize = LogFile.Size
-    MsgBox "Размер файла " & WScript.ScriptName & " : " & LogSize &" килобайт"
+    MsgBox "Р Р°Р·РјРµСЂ С„Р°Р№Р»Р° " & WScript.ScriptName & " : " & LogSize &" РєРёР»РѕР±Р°Р№С‚"
     If LogSize >= 524288 Then
-          MsgBox "Размер Лога большой=" & LogSize
+          MsgBox "Р Р°Р·РјРµСЂ Р›РѕРіР° Р±РѕР»СЊС€РѕР№=" & LogSize
           MoveLogFiles
     End if
   End If
@@ -318,11 +318,11 @@ Function MoveLogFiles
   For i=1 To countlog
     If FileExist(LocalShare & "\" NameFileLog & "." & i & ".zip") = 0 Then
     FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
-    'Создать архив'
+    'РЎРѕР·РґР°С‚СЊ Р°СЂС…РёРІ'
     ProgrammFiles=EnvironmentVariables
     ProgrammFiles
       If i > countlog Then
-      'Удалить старый архив'
+      'РЈРґР°Р»РёС‚СЊ СЃС‚Р°СЂС‹Р№ Р°СЂС…РёРІ'
         FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
       End If
       'Exit For
