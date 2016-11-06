@@ -314,13 +314,23 @@ End Function
 Function MoveLogFiles
   Dim FSO, countlog. ProgrammFiles
   Set FSO = CreateObject("Scripting.FileSystemObject")
+  
   countlog=20
   For i=1 To countlog
     If FileExist(LocalShare & "\" NameFileLog & "." & i & ".zip") = 0 Then
     FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
     'Создать архив'
-    ProgrammFiles=EnvironmentVariables
-    ProgrammFiles
+    Set WSS = CreateObject("Wscript.Shell")
+    xOS = "x64"
+    ProgrammFiles=EnvironmentVariables("%Programw6432%")
+
+    If WSS.ExpandEnvironmentStrings("%PROCESSOR_ARCHITECTURE%") = "x86" AND WSS.ExpandEnvironmentStrings("%PROCESSOR_ARCHITEW6432%") = "%PROCESSOR_ARCHITEW6432%" Then 
+        ProgrammFiles=EnvironmentVariables("%ProgramFiles%")
+        xOS = "x86"
+    End If
+    RunOutEx("""" & ProgrammFiles & "\7-Zip\7z.exe" & """" & " a -tzip " & LocalShare & "\" NameFileLog & "." & i & ".zip " & LocalShare & PathFileLog)
+
+    
       If i > countlog Then
       'Удалить старый архив'
         FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
@@ -329,7 +339,6 @@ Function MoveLogFiles
     End If
   Next
 End Function
-
 
 Function EnvironmentVariables(fvar)
   Set WshShell = WScript.CreateObject("WScript.Shell")
