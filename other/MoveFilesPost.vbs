@@ -2,7 +2,8 @@
 'T1=time
 Option explicit
 Dim ServerShare, LocalShare, ver, ServerMaptekaIn, ServerMaptekaFarm, PathPostA2, PathMailA2, PathPostSKM1, PathMailSKM1, PathPostSKM2, PathMailSKM2, PathPostSKM3, PathMailSKM3, PathPostPIR, PathMailPIR
-Public PathPost, PathMail, iWriteLog, iCheckPath, NameFileLog
+Public PathPost, PathMail, iWriteLog, iCheckPath, NameFileLog, WshShell
+
 iWriteLog=1
 iCheckPath=0
 ver="0.1.5" 'ZAMENA UL
@@ -16,23 +17,23 @@ LocalShare = "D:\POST\"
 
 PathPostA2="\\10.20.30.1\POST_Office"
 'PathPostA2="\\10.20.30.1\POST_A1\A2"
-  'PathMailA2="\\PRIMERGY\Mail"
+'PathMailA2="\\PRIMERGY\Mail"
 
 PathPostSKM1="\\10.20.30.1\POST_Office"
 'PathPostG1="\\10.20.30.1\POST_A1\G1"
-  'PathMailG1="\\172.27.3.1\Mail_Prima"
+'PathMailG1="\\172.27.3.1\Mail_Prima"
 
 PathPostSKM2="\\10.20.30.1\POST_Office"
 'PathPostG2="\\10.20.30.1\POST_A1\G2"
-  'PathMailG2="C:\Mail"
+'PathMailG2="C:\Mail"
 
 PathPostSKM3="\\10.20.30.1\POST_Office"
 'PathPostADV="\\10.20.30.1\POST_A1\ADV"
-  'PathMailADV="\\172.27.5.1\Mail"
+'PathMailADV="\\172.27.5.1\Mail"
 
 PathPostPIR="\\10.20.30.1\POST_Office"
 'PathPostPIR="\\10.20.30.1\POST_A1\PIR"
-  'PathMailPIR="C:\Mail"
+'PathMailPIR="C:\Mail"
 
 WriteLog("                    ")
 WriteLog("                    ")
@@ -42,16 +43,16 @@ WriteLog("Version:            " & ver)
 'WriteLog("OS:                 " & @OSVersion & " " & @OSArch)
 'WriteLog("User:               " & Who)
 
-  'server->–∑–∞–≤–µ–¥—É—é—â–µ–π
+'server->Á‡‚Â‰Û˛˘ÂÈ
 'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
-  '–∑–∞–≤–µ–¥—É—é—â–∞—è-—Å–µ—Ä–≤–µ—Ä
-  'MoveAllFiles LocalShare & "in\", ServerMaptekaIn
-  '—Å–µ—Ä–≤–µ—Ä->–∑–∞–≤–µ–¥—É—é—â–∞—è
-  'MoveAllFiles ServerMaptekaFarm, LocalShare & "out\"
-  '–∑–∞–≤–µ–¥—É—é—â–µ–π->server
+'Á‡‚Â‰Û˛˘‡ˇ-ÒÂ‚Â
+'MoveAllFiles LocalShare & "in\", ServerMaptekaIn
+'ÒÂ‚Â->Á‡‚Â‰Û˛˘‡ˇ
+'MoveAllFiles ServerMaptekaFarm, LocalShare & "out\"
+'Á‡‚Â‰Û˛˘ÂÈ->server
 'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
 
-'–ì–ª–∞–≤–Ω–∞—è –§-–ò–Ø
+'√Î‡‚Ì‡ˇ ‘-»ﬂ
 CheckIP
 WriteLog("Exit")
 CheckLogSize
@@ -59,182 +60,182 @@ WriteLog("Exit.")
 
 
 Sub MoveAllFiles(FDir,OutPath)
-  Dim FSO,FLD,FL,FF, FDirStatus, OutPathStatus
-  Set FSO = CreateObject("Scripting.FileSystemObject")
-  WriteLog("                    ") 
-  WriteLog("In Path: " & FDir)
-  WriteLog("Out Path: " & OutPath)
-  FDirStatus=CheckPath(FDir)
-  OutPathStatus=CheckPath(OutPath)
-  WriteLog("FDirStatus=" & FDirStatus)
-  WriteLog("OutPathStatus=" & OutPathStatus)
-    If FDirStatus And OutPathStatus Then
-      WriteLog("FDir=" & FDir & " OutPath=" & OutPath)
-      WriteLog("Folders exists_moveallfiles")
+Dim FSO,FLD,FL,FF, FDirStatus, OutPathStatus
+Set FSO = CreateObject("Scripting.FileSystemObject")
+WriteLog("                    ") 
+WriteLog("In Path: " & FDir)
+WriteLog("Out Path: " & OutPath)
+FDirStatus=CheckPath(FDir)
+OutPathStatus=CheckPath(OutPath)
+WriteLog("FDirStatus=" & FDirStatus)
+WriteLog("OutPathStatus=" & OutPathStatus)
+	If FDirStatus And OutPathStatus Then
+		WriteLog("FDir=" & FDir & " OutPath=" & OutPath)
+		WriteLog("Folders exists_moveallfiles")
 '      msgbox("1" & chr(10) & FDir & chr(10) & OutPath)
-      Set FLD = FSO.GetFolder(FDir)
-      Set FL = FLD.Files
-      For Each FF in FL
-      WriteLog("In File: " & FDir&FF.Name)
-      WriteLog("Out File: " & OutPath&FF.Name)
+		Set FLD = FSO.GetFolder(FDir)
+		Set FL = FLD.Files
+		For Each FF in FL
+		WriteLog("In File: " & FDir&FF.Name)
+		WriteLog("Out File: " & OutPath&FF.Name)
 '      msgbox(FDir&FF.Name & chr(10) & OutPath&FF.Name)
-        FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
-        FSO.DeleteFile FDir&FF.Name
-      Next
-    Else
-      WriteLog("Folders NOT exists")
-    End If
-  Set FL = Nothing
-  Set FLD = Nothing
-  Set FSO = Nothing
+		FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
+		FSO.DeleteFile FDir&FF.Name
+		Next
+	Else
+		WriteLog("Folders NOT exists")
+	End If
+Set FL = Nothing
+Set FLD = Nothing
+Set FSO = Nothing
 End Sub
 
 Sub CopyAllFiles(FDir,OutPath)
-  Dim FSO,FLD,FL,FF
-  Set FSO = CreateObject("Scripting.FileSystemObject")
-  Set FLD = FSO.GetFolder(FDir)
-  Set FL = FLD.Files
-  For Each FF in FL
-    FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
-  Next
-  Set FL = Nothing
-  Set FLD = Nothing
-  Set FSO = Nothing
+Dim FSO,FLD,FL,FF
+Set FSO = CreateObject("Scripting.FileSystemObject")
+Set FLD = FSO.GetFolder(FDir)
+Set FL = FLD.Files
+For Each FF in FL
+	FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
+Next
+Set FL = Nothing
+Set FLD = Nothing
+Set FSO = Nothing
 End Sub
 
 Sub DeleteFiles(FDir)
-  Dim FSO,FLD,FL,FF
-  Set FSO = CreateObject("Scripting.FileSystemObject")
-  Set FLD = FSO.GetFolder(FDir)
-  Set FL = FLD.Files
-  For Each FF in FL
-    FSO.DeleteFile FDir&FF.Name
-  Next
-  Set FL = Nothing
-  Set FLD = Nothing
-  Set FSO = Nothing
+Dim FSO,FLD,FL,FF
+Set FSO = CreateObject("Scripting.FileSystemObject")
+Set FLD = FSO.GetFolder(FDir)
+Set FL = FLD.Files
+For Each FF in FL
+	FSO.DeleteFile FDir&FF.Name
+Next
+Set FL = Nothing
+Set FLD = Nothing
+Set FSO = Nothing
 End Sub
 
 Sub CheckDrive(strDriveName, strRemoteShare)
-  Dim FSO, objNetwork
-  Set FSO = WScript.CreateObject("Scripting.FileSystemObject")
-  Set objNetwork = WScript.CreateObject("WScript.Network")
+Dim FSO, objNetwork
+Set FSO = WScript.CreateObject("Scripting.FileSystemObject")
+Set objNetwork = WScript.CreateObject("WScript.Network")
 
-  If FSO.DriveExists(strDriveName) Then
-    WriteLog("–î–∏—Å–∫ " & strDriveName & " —É–∂–µ –ø–æ–¥–∫–ª—é—á–µ–Ω")
-    '–í—ã–≤–æ–¥–∏–º –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏—é –Ω–∞ —ç–∫—Ä–∞–Ω
-    'WScript.Echo "–î–∏—Å–∫ " & strDriveName & " —É–∂–µ –ø–æ–¥–∫–ª—é—á–µ–Ω"
-  Else
-    '–ü–æ–¥–∫–ª—é—á–∞–µ–º –¥–∏—Å–∫ y:
-    WriteLog("–í—ã–ø–æ–ª–Ω—è–µ—Ç—Å—è —Å–µ—Ç–µ–≤–æ–µ –ø–æ–¥–∫–ª—é—á–µ–Ω–∏–µ —Å–µ—Ç–µ–≤–æ–≥–æ –¥–∏—Å–∫–∞: " & strDriveName)
-    objNetwork.MapNetworkDrive strDriveName, strRemoteShare
-    iCheckPath="1"
-    WriteLog("–°–µ—Ç–µ–≤–æ–π –î–∏—Å–∫: "& strDriveName & " –£—Å–ø–µ—à–Ω–æ –ø–æ–¥–∫–ª—é—á–µ–Ω")
-    '–í—ã–≤–æ–¥ –∏–Ω—Ñ–æ—Ä–º–∞—Ü–∏–∏ –Ω–∞ —ç–∫—Ä–∞–Ω:
-    'WScript.Echo " –°–µ—Ç–µ–≤–æ–π –î–∏—Å–∫: "& strDriveName & " –£—Å–ø–µ—à–Ω–æ –ø–æ–¥–∫–ª—é—á–µ–Ω"
-  End If
+If FSO.DriveExists(strDriveName) Then
+	WriteLog("ƒËÒÍ " & strDriveName & " ÛÊÂ ÔÓ‰ÍÎ˛˜ÂÌ")
+	'¬˚‚Ó‰ËÏ ËÌÙÓÏ‡ˆË˛ Ì‡ ˝Í‡Ì
+	'WScript.Echo "ƒËÒÍ " & strDriveName & " ÛÊÂ ÔÓ‰ÍÎ˛˜ÂÌ"
+Else
+	'œÓ‰ÍÎ˛˜‡ÂÏ ‰ËÒÍ y:
+	WriteLog("¬˚ÔÓÎÌˇÂÚÒˇ ÒÂÚÂ‚ÓÂ ÔÓ‰ÍÎ˛˜ÂÌËÂ ÒÂÚÂ‚Ó„Ó ‰ËÒÍ‡: " & strDriveName)
+	objNetwork.MapNetworkDrive strDriveName, strRemoteShare
+	iCheckPath="1"
+	WriteLog("—ÂÚÂ‚ÓÈ ƒËÒÍ: "& strDriveName & " ”ÒÔÂ¯ÌÓ ÔÓ‰ÍÎ˛˜ÂÌ")
+	'¬˚‚Ó‰ ËÌÙÓÏ‡ˆËË Ì‡ ˝Í‡Ì:
+	'WScript.Echo " —ÂÚÂ‚ÓÈ ƒËÒÍ: "& strDriveName & " ”ÒÔÂ¯ÌÓ ÔÓ‰ÍÎ˛˜ÂÌ"
+End If
 End Sub
 
 Sub CheckIP
 Dim strComputer, strNetworkConnection, objWMIService, colNics, objNic, colNicConfigs, objNicConfig, strIPAddress, OpenVPNIP
-  WriteLog("Check IP...")
-  strComputer  =  "."
-  ' –æ—Ç—Ä–µ–¥–∞–∫—Ç–∏—Ä–æ–≤–∞—Ç—å –ø–æ–¥ –Ω—É–∂–Ω–æ–µ –∏–º—è —Å–µ—Ç–µ–≤–æ–≥–æ –ø–æ–¥–∫–ª—é—á–µ–Ω–∏—è:
-  strNetworkConnection = "'OpenVPN'"
-  Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
-  Set colNics = objWMIService.ExecQuery("Select * From Win32_NetworkAdapter " _
-    & "Where NetConnectionID = " & strNetworkConnection)
-  For Each objNic in colNics
-    Set colNicConfigs = objWMIService.ExecQuery("ASSOCIATORS OF " _
-        & "{Win32_NetworkAdapter.DeviceID='" & objNic.DeviceID & "'}" _
-        & " WHERE AssocClass=Win32_NetworkAdapterSetting")
-    For Each objNicConfig In colNicConfigs
-        For Each strIPAddress in objNicConfig.IPAddress
-          'Wscript.Echo "IP Address: " & strIPAddress
-          OpenVPNIP=strIPAddress
-          WriteLog(strNetworkConnection & ": " & OpenVPNIP)
-        Next
-    Next
-  Next
+WriteLog("Check IP...")
+strComputer  =  "."
+' ÓÚÂ‰‡ÍÚËÓ‚‡Ú¸ ÔÓ‰ ÌÛÊÌÓÂ ËÏˇ ÒÂÚÂ‚Ó„Ó ÔÓ‰ÍÎ˛˜ÂÌËˇ:
+strNetworkConnection = "'OpenVPN'"
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+Set colNics = objWMIService.ExecQuery("Select * From Win32_NetworkAdapter " _
+	& "Where NetConnectionID = " & strNetworkConnection)
+For Each objNic in colNics
+	Set colNicConfigs = objWMIService.ExecQuery("ASSOCIATORS OF " _
+		& "{Win32_NetworkAdapter.DeviceID='" & objNic.DeviceID & "'}" _
+		& " WHERE AssocClass=Win32_NetworkAdapterSetting")
+	For Each objNicConfig In colNicConfigs
+		For Each strIPAddress in objNicConfig.IPAddress
+		'Wscript.Echo "IP Address: " & strIPAddress
+		OpenVPNIP=strIPAddress
+		WriteLog(strNetworkConnection & ": " & OpenVPNIP)
+		Next
+	Next
+Next
 
-  Select Case OpenVPNIP
-    Case "10.20.30.104"
-      PathPost=PathPostA2
-        'PathMail=PathMailA2
-      WriteLog("Case: 10.20.30.104")
-      MoveAllFiles ServerShare & "A2\out\", LocalShare & "in\"
-      MoveAllFiles LocalShare & "out\", ServerShare & "A2\in\"
-      
-    Case "10.20.30.152"
-      PathPost=PathPostSKM1
-        'PathMail=PathMailG1
-      WriteLog("Case: 10.20.30.52")
-        'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
-        'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
-        'A1-G1
-      MoveAllFiles ServerShare & "SKM1\out\", LocalShare & "in\"
-        'G1-A1
-      MoveAllFiles LocalShare & "out\", ServerShare & "SKM1\in\"
-        'G1-A1-G2
-      'MoveAllFiles LocalShare & "G2\", ServerShare & "G2\out\"
-        
-    Case "10.20.30.201"
-      PathPost=PathPostSKM2
-        'PathMail=PathMailG2
-      WriteLog("Case: 10.20.30.201")
-        'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
-        'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
-        'A1-G2
-      MoveAllFiles ServerShare & "SKM2\out\", LocalShare & "in\"
-        'G2-A1-G1
-      'MoveAllFiles LocalShare & "out\", ServerShare & "G1\out\"
-        'G2-A1
-      MoveAllFiles LocalShare & "out\", ServerShare & "SKM2\in\"
-    
-    Case "10.20.30.170"
-      PathPost=PathPostSKM
-        'PathMail=PathMailADV
-      WriteLog("Case: 10.20.30.170")
-      MoveAllFiles ServerShare & "SKM3\out\", LocalShare & "in\"
-      MoveAllFiles LocalShare & "out\", ServerShare & "SKM3\in\"
-    
-    Case "10.20.30.160"
-      PathPost=PathPostPIR
-        'PathMail=PathMailPIR
-      WriteLog("Case: 10.20.30.160")
-      MoveAllFiles ServerShare & "PIR\out\", LocalShare & "in\"
-      MoveAllFiles LocalShare & "out\", ServerShare & "PIR\in\"
-      
-    Case Else
-      WriteLog("Case: Else")
-      If FileExist("D:\POST\keyVBS") = "1" Then
-        WriteLog("ALEX")
-        'PathPost="\\129.186.1.25\POST\A2"
-        PathPost="\\129.186.1.25\POST_Office"
-          'PathMail="C:\Mail"
-        MoveAllFiles ServerShare & "ALEX\out\", LocalShare & "in\"
-        MoveAllFiles LocalShare & "out\", ServerShare & "ALEX\in\"
-      End If
-    '–∑–∞–≤–µ—Ä—à–∏—Ç—å —Å–∫—Ä–∏–ø—Ç!
-      'PathPost="Aquarius"
-      'PathMail="Aquarius"
-  End Select
+Select Case OpenVPNIP
+	Case "10.20.30.104"
+		PathPost=PathPostA2
+		'PathMail=PathMailA2
+		WriteLog("Case: 10.20.30.104")
+		MoveAllFiles ServerShare & "A2\out\", LocalShare & "in\"
+		MoveAllFiles LocalShare & "out\", ServerShare & "A2\in\"
+		
+	Case "10.20.30.152"
+		PathPost=PathPostSKM1
+		'PathMail=PathMailG1
+		WriteLog("Case: 10.20.30.52")
+		'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
+		'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
+		'A1-G1
+		MoveAllFiles ServerShare & "SKM1\out\", LocalShare & "in\"
+		'G1-A1
+		MoveAllFiles LocalShare & "out\", ServerShare & "SKM1\in\"
+		'G1-A1-G2
+		'MoveAllFiles LocalShare & "G2\", ServerShare & "G2\out\"
+		
+	Case "10.20.30.201"
+		PathPost=PathPostSKM2
+		'PathMail=PathMailG2
+		WriteLog("Case: 10.20.30.201")
+		'MoveAllFiles ServerShare & "out\", LocalShare & "in\"
+		'MoveAllFiles LocalShare & "out\", ServerShare & "in\"
+		'A1-G2
+		MoveAllFiles ServerShare & "SKM2\out\", LocalShare & "in\"
+		'G2-A1-G1
+		'MoveAllFiles LocalShare & "out\", ServerShare & "G1\out\"
+		'G2-A1
+		MoveAllFiles LocalShare & "out\", ServerShare & "SKM2\in\"
+	
+	Case "10.20.30.170"
+		PathPost=PathPostSKM
+		'PathMail=PathMailADV
+		WriteLog("Case: 10.20.30.170")
+		MoveAllFiles ServerShare & "SKM3\out\", LocalShare & "in\"
+		MoveAllFiles LocalShare & "out\", ServerShare & "SKM3\in\"
+	
+	Case "10.20.30.160"
+		PathPost=PathPostPIR
+		'PathMail=PathMailPIR
+		WriteLog("Case: 10.20.30.160")
+		MoveAllFiles ServerShare & "PIR\out\", LocalShare & "in\"
+		MoveAllFiles LocalShare & "out\", ServerShare & "PIR\in\"
+		
+	Case Else
+		WriteLog("Case: Else")
+		If FileExist("D:\POST\keyVBS") = "1" Then
+		WriteLog("ALEX")
+		'PathPost="\\129.186.1.25\POST\A2"
+		PathPost="\\129.186.1.25\POST_Office"
+		'PathMail="C:\Mail"
+		MoveAllFiles ServerShare & "ALEX\out\", LocalShare & "in\"
+		MoveAllFiles LocalShare & "out\", ServerShare & "ALEX\in\"
+		End If
+	'Á‡‚Â¯ËÚ¸ ÒÍËÔÚ!
+		'PathPost="Aquarius"
+		'PathMail="Aquarius"
+End Select
 End Sub 
 
 Sub WriteLog(sData)
-  Dim FSOL, FileLog, PathFileLog
-  Set FSOL = CreateObject("Scripting.FileSystemObject")
-  NameFileLog=MoveFilesPost.log
-  PathFileLog="\" & NameFileLog
-  
-  If FSOL.FileExists(LocalShare & PathFileLog) Then
-    Set FileLog=FSOL.OpenTextFile(LocalShare & PathFileLog, 8)
-  End If
+Dim FSOL, FileLog, PathFileLog
+Set FSOL = CreateObject("Scripting.FileSystemObject")
+NameFileLog="MoveFilesPost.log"
+PathFileLog="\" & NameFileLog
 
-  If Not FSOL.FileExists(LocalShare & PathFileLog) Then
-    SET FileLog=FSOL.CreateTextFile(LocalShare & PathFileLog, True)
-  End If
-  
+If FSOL.FileExists(LocalShare & PathFileLog) Then
+	Set FileLog=FSOL.OpenTextFile(LocalShare & PathFileLog, 8)
+End If
+
+If Not FSOL.FileExists(LocalShare & PathFileLog) Then
+	SET FileLog=FSOL.CreateTextFile(LocalShare & PathFileLog, True)
+End If
+
 	If iWriteLog = 1 Then
 		If sData = "                    " Then
 			FileLog.WriteLine("                    ")
@@ -244,7 +245,7 @@ Sub WriteLog(sData)
 			'WScript.Echo (HOUR(NOW) & ":" & MINUTE(NOW) & ":" & SECOND(NOW) & " " & DAY(NOW) & "/" & MONTH(NOW) & "/" & YEAR(NOW) & " " & sData)
 		End If
 	End If
-    FileLog.Close
+	FileLog.Close
 End Sub
 
 Function Who
@@ -259,79 +260,85 @@ Function Who
 End Function
 
 Function CheckPath(Path)
-  Dim FSO
-  Set FSO = CreateObject("Scripting.FileSystemObject")
-  WriteLog("CheckPath: " & Path & "=" & FSO.FolderExists(Path))
-    If FSO.FolderExists(Path) Then
-      WriteLog("Folders exists_checkpatch")
-      iCheckPath="1"
-    Else
-      iCheckPath="0"
-      WriteLog("Folder NOT exists")
-            
-      If Left(Path,2) = "P:" Then
-        CheckDrive "P:", PathPost
-      End If
-      
-      If Left(Path,2) = "X:" Then
-      WriteLog("REM")
-        'CheckDrive "X:", PathMail
-      End If
-      
-      If Left(Path,2) = "D:" Then
-        WriteLog("Folder: " & Path & " NOT Exist")
-        '–ø—Ä–æ–≤–µ—Ä–∏—Ç—å —Å—Ç—Ä—É–∫—Ç—É—Ä—É –ª–æ–∫–∞–ª—å–Ω–æ–π –ø–∞–ø–∫–∏
-      End If
-    End If
-    CheckPath=iCheckPath
+Dim FSO
+Set FSO = CreateObject("Scripting.FileSystemObject")
+WriteLog("CheckPath: " & Path & "=" & FSO.FolderExists(Path))
+	If FSO.FolderExists(Path) Then
+		WriteLog("Folders exists_checkpatch")
+		iCheckPath="1"
+	Else
+		iCheckPath="0"
+		WriteLog("Folder NOT exists")
+			
+		If Left(Path,2) = "P:" Then
+		CheckDrive "P:", PathPost
+		End If
+		
+		If Left(Path,2) = "X:" Then
+		WriteLog("REM")
+		'CheckDrive "X:", PathMail
+		End If
+		
+		If Left(Path,2) = "D:" Then
+		WriteLog("Folder: " & Path & " NOT Exist")
+		'ÔÓ‚ÂËÚ¸ ÒÚÛÍÚÛÛ ÎÓÍ‡Î¸ÌÓÈ Ô‡ÔÍË
+		End If
+	End If
+	CheckPath=iCheckPath
 End Function
 
 Function FileExist(fFile)
-  Dim FSOFE
-  Set FSOFE = CreateObject("Scripting.FileSystemObject")
-      If FSOFE.FileExists(fFile) Then
-        FileExist="1"
-      Else
-        FileExist="0"
-      End If
+Dim FSOFE
+Set FSOFE = CreateObject("Scripting.FileSystemObject")
+		If FSOFE.FileExists(fFile) Then
+		FileExist="1"
+		Else
+		FileExist="0"
+		End If
 End Function
 
 Function CheckLogSize
-  Dim FSOL1, FileLog, PathFileLog, LogFile, PathScript, PathFolderScript, LogSize
-  Set FSOL1 = CreateObject("Scripting.FileSystemObject")
-  PathFileLog="\" & NameFileLog
-  If FSOL1.FileExists(LocalShare & PathFileLog) Then
-    Set LogFile = FSOL1.GetFile(LocalShare & PathFileLog)
-    LogSize = LogFile.Size
-    MsgBox "–†–∞–∑–º–µ—Ä —Ñ–∞–π–ª–∞ " & WScript.ScriptName & " : " & LogSize &" –∫–∏–ª–æ–±–∞–π—Ç"
-    If LogSize >= 524288 Then
-          MsgBox "–†–∞–∑–º–µ—Ä –õ–æ–≥–∞ –±–æ–ª—å—à–æ–π=" & LogSize
-          MoveLogFiles
-    End if
-  End If
+Dim FSOL1, FileLog, PathFileLog, LogFile, PathScript, PathFolderScript, LogSize
+Set FSOL1 = CreateObject("Scripting.FileSystemObject")
+PathFileLog="\" & NameFileLog
+If FSOL1.FileExists(LocalShare & PathFileLog) Then
+	Set LogFile = FSOL1.GetFile(LocalShare & PathFileLog)
+	LogSize = LogFile.Size
+	WriteLog ("–‡ÁÏÂ Ù‡ÈÎ‡ " & WScript.ScriptName & " : " & LogSize &" ÍËÎÓ·‡ÈÚ")
+	If LogSize >= 524288 Then
+		WriteLog ("–‡ÁÏÂ ÀÓ„‡ ·ÓÎ¸¯ÓÈ=" & LogSize)
+		MoveLogFiles
+	End if
+End If
 End Function
 
 Function MoveLogFiles
-  Dim FSO, countlog. ProgrammFiles
-  Set FSO = CreateObject("Scripting.FileSystemObject")
-  countlog=20
-  For i=1 To countlog
-    If FileExist(LocalShare & "\" NameFileLog & "." & i & ".zip") = 0 Then
-    FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
-    '–°–æ–∑–¥–∞—Ç—å –∞—Ä—Ö–∏–≤'
-    ProgrammFiles=EnvironmentVariables
-    ProgrammFiles
-      If i > countlog Then
-      '–£–¥–∞–ª–∏—Ç—å —Å—Ç–∞—Ä—ã–π –∞—Ä—Ö–∏–≤'
-        FSO.MoveFile LocalShare & "\" NameFileLog, LocalShare & "\" NameFileLog & "." & i
-      End If
-      'Exit For
-    End If
-  Next
+    Dim FSO, newNameFileLog
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+    newNameFileLog=LocalShare & NameFileLog & ".old"
+    FSO.MoveFile LocalShare & NameFileLog, newNameFileLog
+    RunOutEx("""" & ProgrammFiles & "\7-Zip\7z.exe""" & " a -tzip " & newNameFileLog & ".zip " & newNameFileLog)
 End Function
 
-
 Function EnvironmentVariables(fvar)
-  Set WshShell = WScript.CreateObject("WScript.Shell")
-  EnvironmentVariables=WshShell.ExpandEnvironmentStrings(fvar)
+	Set WshShell = WScript.CreateObject("WScript.Shell")
+	EnvironmentVariables=WshShell.ExpandEnvironmentStrings(fvar)
+End Function
+
+Function RunOutEx(cmd)
+	set WshShell = WScript.CreateObject("WScript.Shell")
+	'msgbox(cmd)
+	WshShell.Run cmd
+End Function
+
+Function ProgrammFiles
+	Dim WshProEnv, SysInfo
+	Set WshShell = WScript.CreateObject("WScript.Shell")
+	Set WshProEnv = WshShell.Environment("SYSTEM") 
+	SysInfo = WshProEnv.Item("PROCESSOR_ARCHITECTURE")
+	If SysInfo = "x86" Then
+		ProgrammFiles=EnvironmentVariables("%ProgramFiles%")
+	Else
+		ProgrammFiles=EnvironmentVariables("%ProgramW6432%")
+	End If
 End Function
