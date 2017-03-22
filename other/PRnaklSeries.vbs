@@ -8,14 +8,16 @@ Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfSum,dbfConn
 Dim FSO
 Dim EAN, ConEnt, EntExl
-Dim NameXLS
+Dim NameXLS, FDirOut
+Const strLenEAN=12
+Const SKM="СК-МедФарм"
 
 Const DirDBF= "X:\PRnakl\" '"C:\braki\1\"
 Const NameDBF="Prichod.dbf"
-
+Randomize
 Const TemplateFile="X:\PRnakl\PRnakl.ots" ' Файл с шаблоном отчета
-Const FDirOut="X:\PRnakl\"   ' Путь куда выкладывать файл с отчетом
-NameXLS="общий склад " & Date & ".xls"
+FDirOut="X:\PRnakl\"   ' Путь куда выкладывать файл с отчетом
+NameXLS="общий1 склад " & Date & " " & Int(Rnd*999999) & ".xls"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 
@@ -52,8 +54,20 @@ Set dbfPrice.ActiveConnection = dbfConn
 '********************************************************
 
 dbfPrice.Open "SELECT * FROM ["&NameDBF&"]"
+
+'msgbox dbfPrice.Fields("NAMESUB2")
+If InStr(1,dbfPrice.Fields("NAMESUB2"), SKM) Then
+	FDirOut="X:\PRnakl\SKM\"   ' Путь куда выкладывать файл с отчетом
+	NameXLS="Склад СК-МедФарм " & Date & ".xls"
+Else
+	FDirOut="X:\PRnakl\Kor\"   ' Путь куда выкладывать файл с отчетом
+	NameXLS="Общий Склад " & Date & ".xls"
+End If
+
 Do
 	EAN=inputbox("Введите штрих-код:")
+	EAN=CheckLenName(EAN)
+	'msgbox EAN
 	dbfPrice.MoveFirst
 	Do While Not dbfPrice.Eof
 		If fReadDBFFixNull("BARCODE") = EAN Then
@@ -87,19 +101,22 @@ Loop While EntExl < 10
 
 dbfPrice.Close
 
-Dim mFileType(0)
+Dim mFileType(0), ArgsSave(1)
 
-Set mFileType(0) = oServiceManager.Bridge_GetStruct("com.sun.star.beans.PropertyValue")
+'Set mFileType(0) = oServiceManager.Bridge_GetStruct("com.sun.star.beans.PropertyValue")
 
 'dummy(0).Name = "Overwrite"
 'dummy(0).Value = True
 
 'mFileType(0).Name = "Overwrite"
 'mFileType(0).Value = True
-mFileType(0).Name = "FilterName"
-mFileType(0).Value="MS Excel 97"
-msgbox ConvertToURL(FDirOut & NameXLS)
-call oBook.storeAsUrl(ConvertToURL(FDirOut & NameXLS),mFileType)
+'mFileType(0).Name = "FilterName"
+'mFileType(0).Value="MS Excel 97"
+
+Set ArgsSave(0)=MakePropertyValue("Overwrite", False)
+Set ArgsSave(0)=MakePropertyValue("FilterName", "MS Excel 97")
+'msgbox ConvertToURL(FDirOut & NameXLS)
+call oBook.storeAsUrl(ConvertToURL(FDirOut & NameXLS),ArgsSave)
 
 'fExportAs oBook, "file:///C:/braki/1/1CDocs.xls"
 'Function fExportAs(oDoc, sURL)
@@ -149,3 +166,42 @@ Function ConvertFromURL(strFile1)
     'strFile1 = "file:///" + strFile1
     ConvertFromUrl = strFile1
 End Function
+
+Function DelBigName(LR, strDelBN)
+  'Dim FFNew
+	If LR = "L" Then
+		strDelBN=Left(strDelBN, strLenEAN)
+	End If
+	If LR = "R" Then
+		strDelBN=Right(strDelBN, strLenEAN)
+	End If
+	DelBigName=strDelBN
+	'FFNew=FDir & strDelBN & ".dbf"
+  'msgbox(FF & "--" & FFNew)
+  'FF.Move (FFNew) 
+  'msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbg'")
+  'msgbox(strDelBN)
+End Function
+
+
+Function CheckLenName(CLN)
+  If Len(CLN)>strLenEAN Then
+	'msgbox CLN & vbCRLF & DelBigName("L", CLN)
+	CheckLenName=DelBigName("L", CLN)
+  Else
+	CheckLenName=CLN
+  End If
+  
+  If Len(CLN)>strLenEAN Then
+    msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbf'. Количество символов=" & Len(CLN) & Chr(13)&Chr(10) & "Будет крах, звонить 911 с корпоративного телефона")
+  End If
+End Function
+
+Function MakePropertyValue(cName, uValue)' As Object
+	Dim oStruct', oServiceManager 'as Object
+    'Set oServiceManager = CreateObject("com.sun.star.ServiceManager")
+    Set oStruct = oServiceManager.Bridge_GetStruct("com.sun.star.beans.PropertyValue")
+    oStruct.Name = cName
+    oStruct.Value = uValue
+    Set MakePropertyValue = oStruct
+End Function 
