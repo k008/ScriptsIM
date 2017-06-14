@@ -12,12 +12,19 @@ Dim objSWbemObjectEx
 Dim strCommandLine
 Dim lngProcessID
 
-Dim ver, LocalShare, OSVersion, OSArch, CompName, sProductType
-Public PathPost, PathMail, iWriteLog, iCheckPath, iPing, FSO
+Dim ver, LocalShare, OSVersion, OSArch, CompName, sProductType, WshShell, OsVer
+Public PathPost, PathMail, iWriteLog, iCheckPath, iPing, PathFileLog, PathFullFileLog, ScriptFullName, ScriptName, FSO, FSOL
+Set FSO = CreateObject("Scripting.FileSystemObject")
+Set FSOL = CreateObject("Scripting.FileSystemObject")
+Set ScriptFullName = FSOL.GetFile(Wscript.ScriptFullName)
+ScriptName = FSOL.GetFileName(ScriptFullName)
+PathFileLog = "\" & ScriptName & ".log"
+LocalShare = WScript.CreateObject("Scripting.FileSystemObject").GetSpecialFolder(2)
+PathFullFileLog = LocalShare & PathFileLog
+
 iWriteLog=1
 iCheckPath=0
 ver="0.0.1"
-LocalShare = WScript.CreateObject("Scripting.FileSystemObject").GetSpecialFolder(2)
 
 WriteLog("                    ")
 WriteLog("                    ")
@@ -32,6 +39,7 @@ WriteLog("Version:            " & ver)
 strComputerName = "Magistr"
 strShare    = "\\" & strComputerName & "\netlogon"
 strComputer = "."
+iPing = Ping(strComputerName)
 
 Set objSWbemLocator    = WScript.CreateObject("WbemScripting.SWbemLocator")
 Set objSWbemServicesEx = objSWbemLocator.ConnectServer(strComputer, "root\cimv2")
@@ -42,6 +50,7 @@ For Each objSWbemObjectEx In collSWbemObjectSet
 		'msgbox .Version
 		'msgbox "123321" & .Caption
 		CompName = .CSName
+		
 		Select Case .ProductType
             Case "1"
 				sProductType = "Work Station"
@@ -51,7 +60,6 @@ For Each objSWbemObjectEx In collSWbemObjectSet
 				sProductType = "Server"
 		End Select
 
-		
         Select Case .Version
             Case "5.1.2600"             ' Windows XP X86
                 'strCommandLine = strShare & "\VPN_XP_32.exe"
@@ -77,10 +85,10 @@ For Each objSWbemObjectEx In collSWbemObjectSet
         End Select
     End With
 Next
+
 WriteLog("OS:                 " & OSVersion & " " & OSArch)
 WriteLog("Type:               " & sProductType)
 WriteLog("Computer Name:      " & CompName)
-
 
 '-------------------------------------------'
 If Not IsEmpty(strCommandLine) Then
@@ -102,10 +110,9 @@ Set objSWbemLocator    = Nothing
 
 'path = FSO.GetParentFolderName(F)
 
-Dim WshShell, OsVer
 Set WshShell = CreateObject("WScript.Shell")
 OsVer = WshShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentVersion")
-msgbox OsVer
+'msgbox OsVer
 
 Dim objSWbemServices, colSWbemObjectSet', colSWbemObject
 strComputer = "."
@@ -114,16 +121,41 @@ Set colSWbemObjectSet = objSWbemServices.InstancesOf("Win32_OperatingSystem")
 'For Each objSWbemObject In colSWbemObjectSet
     'Wscript.Echo "Object Path: " & objSWbemObject
 'Next
-Set FSO = CreateObject("Scripting.FileSystemObject")
 
+Dim objWMIService, colComputer, objComputer
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2")
+Set colComputer = objWMIService.ExecQuery("Select * from Win32_ComputerSystem")
+'Set WshShell = CreateObject( "Wscript.Shell")
+For Each objComputer in colComputer
+    WriteLog("User:               " & objComputer.UserName)
+Next
 
-iPing = Ping(strComputerName)
+Dim colProcesses, objProcess, strNameOfUser, Return
+Set colProcesses = GetObject("winmgmts:" & _
+   "{impersonationLevel=impersonate}!\\" & strComputer & _
+   "\root\cimv2").ExecQuery("Select * from Win32_Process")
+
+For Each objProcess in colProcesses
+
+    Return = objProcess.GetOwner(strNameOfUser)
+    If Return <> 0 Then
+        WriteLog "        Could not get owner info for process " & _  
+            objProcess.Name & VBNewLine _
+            & "Error = " & Return
+    Else 
+        WriteLog "        Process " _
+            & objProcess.Name & " is owned by " _ 
+            & "\" & strNameOfUser & "."
+    End If
+Next
 
 If iPing=0 Then
 	WriteLog("Интернет есть")
 		If CheckPath(strShare) = 1 Then
 			WriteLog("Каталог существует  " & strShare)
-			''FSO.CopyFile DirDBF&NameDBF, DirSKM&NameDBF
+			'msgbox PathFullFileLog
+			FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & ".log"
+			
 		End If
 Else
 	WriteLog("Интернета НЕТ, код ошибки: "& iPing)
@@ -131,20 +163,20 @@ Else
 End If
 
 Sub WriteLog(sData)
-  Dim FSOL, FileLog, PathFileLog, ScriptFullName, ScriptName
-  Set FSOL = CreateObject("Scripting.FileSystemObject")
-  Set ScriptFullName = FSOL.GetFile(Wscript.ScriptFullName)
-  ScriptName = FSOL.GetFileName(ScriptFullName)
+  Dim FileLog', FSOL, PathFileLog, ScriptFullName, ScriptName
+  'Set FSOL = CreateObject("Scripting.FileSystemObject")
+  'Set ScriptFullName = FSOL.GetFile(Wscript.ScriptFullName)
+  'ScriptName = FSOL.GetFileName(ScriptFullName)
+  'PathFileLog = "\" & ScriptName & ".log"
   
-  'msgbox ScriptName
+  'msgbox PathFullFileLog
   
-  PathFileLog = "\" & ScriptName & ".log"
-  If FSOL.FileExists(LocalShare & PathFileLog) Then
-    Set FileLog=FSOL.OpenTextFile(LocalShare & PathFileLog, 8)
+  If FSOL.FileExists(PathFullFileLog) Then
+    Set FileLog=FSOL.OpenTextFile(PathFullFileLog, 8)
   End If
 
-  If Not FSOL.FileExists(LocalShare & PathFileLog) Then
-    SET FileLog=FSOL.CreateTextFile(LocalShare & PathFileLog, True)
+  If Not FSOL.FileExists(PathFullFileLog) Then
+    SET FileLog=FSOL.CreateTextFile(PathFullFileLog, True)
   End If
   
 	If iWriteLog = 1 Then
