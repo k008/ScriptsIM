@@ -12,6 +12,20 @@ Dim objSWbemObjectEx
 Dim strCommandLine
 Dim lngProcessID
 
+Dim MSUpdate(3,3)
+MSUpdate(1,1) = "KB4012212"
+MSUpdate(2,1) = "7"
+MSUpdate(3,1) = 0
+
+MSUpdate(1,2) = "KB4012215"
+MSUpdate(2,2) = "7"
+MSUpdate(3,2) = 0
+
+MSUpdate(1,3) = "KB4012598"
+MSUpdate(2,3) = "XP"
+MSUpdate(3,3) = 0
+
+
 Dim ver, LocalShare, OSVersion, OSArch, CompName, sProductType, WshShell, OsVer
 Public PathPost, PathMail, iWriteLog, iCheckPath, iPing, PathFileLog, PathFullFileLog, ScriptFullName, ScriptName, FSO, FSOL
 Set FSO = CreateObject("Scripting.FileSystemObject")
@@ -136,7 +150,6 @@ Set colProcesses = GetObject("winmgmts:" & _
    "\root\cimv2").ExecQuery("Select * from Win32_Process")
 
 For Each objProcess in colProcesses
-
     Return = objProcess.GetOwner(strNameOfUser)
     If Return <> 0 Then
         WriteLog "        Could not get owner info for process " & _  
@@ -154,6 +167,7 @@ If iPing=0 Then
 		If CheckPath(strShare) = 1 Then
 			WriteLog("Каталог существует  " & strShare)
 			'msgbox PathFullFileLog
+			CheckMSUpdates
 			FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & ".log"
 			
 		End If
@@ -211,5 +225,53 @@ Function CheckPath(Path)
   End If
   'CheckPath=iCheckPath
 End Function
+
+Sub CheckMSUpdates()
+	'Dim strComputer
+	Dim objWmiService
+	Dim wmiNS
+	Dim wmiQuery
+	Dim objItem
+	Dim colItems
+	Dim objSWbemObjectEx
+	'Dim MSUpdate(3,3)
+	Dim i, f
+
+	WriteLog("Start search Updates")
+
+	wmiNS = "\root\cimv2"
+	wmiQuery = "Select * from Win32_QuickFixEngineering"
+	Set objWMIService = GetObject("winmgmts:\\" & strComputer & wmiNS)
+	Set colItems = objWMIService.ExecQuery(wmiQuery)
+	 
+	For Each objItem in colItems
+	'    Wscript.Echo "Caption: " & objItem.Caption
+		'Wscript.Echo "CSName: " & objItem.CSName
+		'Wscript.Echo "Description: " & objItem.Description
+		'Wscript.Echo "FixComments: " & objItem.FixComments
+		'Wscript.Echo "HotFixID: " & objItem.HotFixID
+	'    Wscript.Echo "InstallDate: " & objItem.InstallDate
+	'    Wscript.Echo "InstalledBy: " & objItem.InstalledBy
+	'    Wscript.Echo "InstalledOn: " & objItem.InstalledOn
+		'Wscript.Echo "Name: " & objItem.Name
+	'    Wscript.Echo "ServicePackInEffect: " & objItem.ServicePackInEffect
+	'    Wscript.Echo "Status: " & objItem.Status
+		For i = 1 To UBound(MSUpdate,1)  Step 1
+			If MSUpdate(1, i) = objItem.HotFixID Then
+				If MSUpdate(2, i) = OSVersion Then
+					If MSUpdate(3, i) = 0 Then
+			'For f = 1 To UBound(MSUpdate,2) Step 1
+						MSUpdate(3, i) = 1
+						'WScript.Echo MSUpdate(1, i) & " " & MSUpdate(2, i) & " " & MSUpdate(3, i)
+						WriteLog("Обновление: " & MSUpdate(1, i) & " уже было ранее установлено: " & objItem.InstalledOn)
+			'Next
+					End If
+				End If
+			End If
+		Next
+	Next
+
+		WriteLog("End search Updates")
+End Sub
 
 WScript.Quit 0
