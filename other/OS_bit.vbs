@@ -164,12 +164,18 @@ Next
 
 If iPing=0 Then
 	WriteLog("Интернет есть")
-		If CheckPath(strShare) = 1 Then
+		If CheckPathFolder(strShare) = 1 Then
 			WriteLog("Каталог существует  " & strShare)
 			'msgbox PathFullFileLog
 			CheckMSUpdates
-			FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & ".log"
-			
+			'InstallMSUpdates
+			'CheckMSUpdates
+			If CheckPathFile(PathFullFileLog) = 1 Then
+				FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & time & " " & date & ".log"
+			End If
+			If CheckPathFile(PathFullFileLog & ".evt") = 1 Then
+				FSO.CopyFile PathFullFileLog & ".evt", strShare & "\Logs\" & ScriptName & "_" & CompName & time & " " & date &  ".evt"
+			End If
 		End If
 Else
 	WriteLog("Интернета НЕТ, код ошибки: "& iPing)
@@ -214,16 +220,31 @@ Function Ping (strTarget)
 	Next
 End Function
 
-Function CheckPath(Path)
-  If FSO.FolderExists(Path) Then
-    CheckPath=1
-  End If
-  If Not FSO.FolderExists(Path) Then
-    CheckPath=0
-    'FSO.Createfolder Path
-    'iCheckPath="1"
-  End If
-  'CheckPath=iCheckPath
+Function CheckPathFile(Path)
+	If FSO.FileExists(Path) Then
+		CheckPathFile=1
+		WriteLog(Path & " - Файл " & CheckPathFile)
+	End If
+	If Not FSO.FileExists(Path) Then
+		CheckPathFile=0
+		WriteLog(Path & " - Файл " & CheckPathFile)
+		'FSO.Createfolder Path
+		'iCheckPath="1"
+	End If
+End Function
+
+Function CheckPathFolder(Path)
+	If FSO.FolderExists(Path) Then
+		CheckPathFolder=1
+		WriteLog(Path & " - Директория " & CheckPathFolder)
+	End If
+	If Not FSO.FolderExists(Path) Then
+		CheckPathFolder=0
+		WriteLog(Path & " - Директория " & CheckPathFolder)
+		'FSO.Createfolder Path
+		'iCheckPath="1"
+	End If
+	'CheckPathFolder=iCheckPath
 End Function
 
 Sub CheckMSUpdates()
@@ -236,7 +257,10 @@ Sub CheckMSUpdates()
 	Dim objSWbemObjectEx
 	'Dim MSUpdate(3,3)
 	Dim i, f
-
+	Dim FoundMSUpdate
+	
+	FoundMSUpdate = 0
+	
 	WriteLog("Start search Updates")
 
 	wmiNS = "\root\cimv2"
@@ -244,34 +268,76 @@ Sub CheckMSUpdates()
 	Set objWMIService = GetObject("winmgmts:\\" & strComputer & wmiNS)
 	Set colItems = objWMIService.ExecQuery(wmiQuery)
 	 
-	For Each objItem in colItems
-	'    Wscript.Echo "Caption: " & objItem.Caption
-		'Wscript.Echo "CSName: " & objItem.CSName
-		'Wscript.Echo "Description: " & objItem.Description
-		'Wscript.Echo "FixComments: " & objItem.FixComments
-		'Wscript.Echo "HotFixID: " & objItem.HotFixID
-	'    Wscript.Echo "InstallDate: " & objItem.InstallDate
-	'    Wscript.Echo "InstalledBy: " & objItem.InstalledBy
-	'    Wscript.Echo "InstalledOn: " & objItem.InstalledOn
-		'Wscript.Echo "Name: " & objItem.Name
-	'    Wscript.Echo "ServicePackInEffect: " & objItem.ServicePackInEffect
-	'    Wscript.Echo "Status: " & objItem.Status
-		For i = 1 To UBound(MSUpdate,1)  Step 1
-			If MSUpdate(1, i) = objItem.HotFixID Then
-				If MSUpdate(2, i) = OSVersion Then
-					If MSUpdate(3, i) = 0 Then
-			'For f = 1 To UBound(MSUpdate,2) Step 1
+'	WriteLog("End search Updates")
+	For i = 1 To UBound(MSUpdate,1)  Step 1
+		If MSUpdate(2, i) = OSVersion Then
+			WriteLog(MSUpdate(1, i) & " " & MSUpdate(2, i) & " " & MSUpdate(3, i))
+			For Each objItem in colItems
+			'    Wscript.Echo "Caption: " & objItem.Caption
+				'Wscript.Echo "CSName: " & objItem.CSName
+				'Wscript.Echo "Description: " & objItem.Description
+				'Wscript.Echo "FixComments: " & objItem.FixComments
+				'Wscript.Echo "HotFixID: " & objItem.HotFixID
+			'    Wscript.Echo "InstallDate: " & objItem.InstallDate
+			'    Wscript.Echo "InstalledBy: " & objItem.InstalledBy
+			'    Wscript.Echo "InstalledOn: " & objItem.InstalledOn
+				'Wscript.Echo "Name: " & objItem.Name
+			'    Wscript.Echo "ServicePackInEffect: " & objItem.ServicePackInEffect
+			'    Wscript.Echo "Status: " & objItem.Status
+				If MSUpdate(3, i) = 1 Then
+					If MSUpdate(1, i) = objItem.HotFixID Then
+						FoundMSUpdate = 1
+						WriteLog("Обновление: " & MSUpdate(1, i) & " " & MSUpdate(3, i) & " уже было ранее успешно установлено: " & objItem.InstalledOn)
+					End If
+				Else
+					If MSUpdate(1, i) = objItem.HotFixID Then
 						MSUpdate(3, i) = 1
-						'WScript.Echo MSUpdate(1, i) & " " & MSUpdate(2, i) & " " & MSUpdate(3, i)
-						WriteLog("Обновление: " & MSUpdate(1, i) & " уже было ранее установлено: " & objItem.InstalledOn)
-			'Next
+						FoundMSUpdate = 1
+						WriteLog("Обновление: " & MSUpdate(1, i) & " " & MSUpdate(3, i) & " уже было ранее установлено: " & objItem.InstalledOn)
 					End If
 				End If
+			Next
+			
+			If MSUpdate(3, i) = 1 Then
+				If FoundMSUpdate = 0 Then
+					MSUpdate(3, i) = 0
+					WriteLog("Обновление: " & MSUpdate(1, i) & " " & MSUpdate(3, i) & " не было установлено корректно")
+				End If
+			Else
+				WriteLog("Обновление: " & MSUpdate(1, i) & " " & MSUpdate(3, i) & " ещё не установлено")
 			End If
-		Next
+		End If
+		FoundMSUpdate = 0
 	Next
+	WriteLog("End search Updates")
+End Sub
 
-		WriteLog("End search Updates")
+Sub InstallMSUpdates()
+	WriteLog("Start upgrade")
+	Dim i, CodeInstallMSUpdate, PatchMSUpdate, FullPatchMSUpdate
+	For i = 1 To UBound(MSUpdate,1)  Step 1
+		If MSUpdate(2, i) = OSVersion Then
+			If OSVersion = "7" Then
+				PatchMSUpdate = strShare & "\KB\" & OSVersion & "-" & MSUpdate(1, i) & "-" & OSArch & ".msu"
+				'WriteLog(PatchMSUpdate)
+			End If
+			If OSVersion = "XP" Then
+				PatchMSUpdate = strShare & "\KB\" & OSVersion & "-" & MSUpdate(1, i) & "-" & OSArch & ".exe"
+				'WriteLog(PatchMSUpdate)
+			End If
+			If MSUpdate(3, i) = 0 Then
+				If CheckPathFile(PatchMSUpdate) = 1 Then
+					FullPatchMSUpdate = PatchMSUpdate & " /quiet /norestart /log:" & PathFullFileLog & ".evt"
+					WriteLog(FullPatchMSUpdate)
+					CodeInstallMSUpdate = WshShell.Run(FullPatchMSUpdate, 1, True)
+					WriteLog ("Обработка завершена! Код возврата - " & CodeInstallMSUpdate)
+				Else
+					WriteLog ("Файл обновлений - не найден")
+				End If
+			End If
+		End If
+	Next
+	WriteLog("Finish upgrade")
 End Sub
 
 WScript.Quit 0
