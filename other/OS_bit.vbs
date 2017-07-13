@@ -12,7 +12,7 @@ Dim objSWbemObjectEx
 Dim strCommandLine
 Dim lngProcessID
 
-Dim MSUpdate(3,3)
+Dim MSUpdate(3,5)
 MSUpdate(1,1) = "KB4012212"
 MSUpdate(2,1) = "7"
 MSUpdate(3,1) = 0
@@ -25,8 +25,16 @@ MSUpdate(1,3) = "KB4012598"
 MSUpdate(2,3) = "XP"
 MSUpdate(3,3) = 0
 
+MSUpdate(1,4) = "KB4015546"
+MSUpdate(2,4) = "7"
+MSUpdate(3,4) = 0
 
-Dim ver, LocalShare, OSVersion, OSArch, CompName, sProductType, WshShell, OsVer
+MSUpdate(1,5) = "KB4015549"
+MSUpdate(2,5) = "7"
+MSUpdate(3,5) = 0
+
+
+Dim ver, LocalShare, OSVersion, OSArch, CompName, sProductType, WshShell, OsVer, sTime, sDate
 Public PathPost, PathMail, iWriteLog, iCheckPath, iPing, PathFileLog, PathFullFileLog, ScriptFullName, ScriptName, FSO, FSOL
 Set FSO = CreateObject("Scripting.FileSystemObject")
 Set FSOL = CreateObject("Scripting.FileSystemObject")
@@ -39,6 +47,8 @@ PathFullFileLog = LocalShare & PathFileLog
 iWriteLog=1
 iCheckPath=0
 ver="0.0.1"
+sTime = Hour(time) & Minute(time) & Second(time)
+sDate = Day(date) & Month(date) & Year(date)
 
 WriteLog("                    ")
 WriteLog("                    ")
@@ -50,7 +60,7 @@ WriteLog("Version:            " & ver)
 
 'msgbox LocalShare
 
-strComputerName = "Magistr"
+strComputerName = "magistr.mirlekarstw.ru"
 strShare    = "\\" & strComputerName & "\netlogon"
 strComputer = "."
 iPing = Ping(strComputerName)
@@ -168,20 +178,20 @@ If iPing=0 Then
 			WriteLog("Каталог существует  " & strShare)
 			'msgbox PathFullFileLog
 			CheckMSUpdates
-			'InstallMSUpdates
-			'CheckMSUpdates
+			InstallMSUpdates
+			CheckMSUpdates
 			If CheckPathFile(PathFullFileLog) = 1 Then
-				FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & time & " " & date & ".log"
+				FSO.CopyFile PathFullFileLog, strShare & "\Logs\" & ScriptName & "_" & CompName & "_" & sTime & "_" & sDate & ".log"
 			End If
-			If CheckPathFile(PathFullFileLog & ".evt") = 1 Then
-				FSO.CopyFile PathFullFileLog & ".evt", strShare & "\Logs\" & ScriptName & "_" & CompName & time & " " & date &  ".evt"
+			If CheckPathFile(PathFullFileLog & sTime & "_" & sDate & ".evt") = 1 Then
+				FSO.CopyFile PathFullFileLog & sTime & "_" & sDate & ".evt", strShare & "\Logs\" & ScriptName & "_" & CompName & "_" & sTime & "_" & sDate &  ".evt"
 			End If
 		End If
 Else
 	WriteLog("Интернета НЕТ, код ошибки: "& iPing)
 	WriteLog("Копьютер Офис-Менеджера ВЫКЛЮЧЕН? Код: " & iPing)
 End If
-
+WriteLog("END.")
 Sub WriteLog(sData)
   Dim FileLog', FSOL, PathFileLog, ScriptFullName, ScriptName
   'Set FSOL = CreateObject("Scripting.FileSystemObject")
@@ -269,7 +279,8 @@ Sub CheckMSUpdates()
 	Set colItems = objWMIService.ExecQuery(wmiQuery)
 	 
 '	WriteLog("End search Updates")
-	For i = 1 To UBound(MSUpdate,1)  Step 1
+	For i = 1 To UBound(MSUpdate,2)  Step 1
+		WriteLog("Все обновления " & MSUpdate(1, i) & " " & MSUpdate(2, i) & " " & MSUpdate(3, i))
 		If MSUpdate(2, i) = OSVersion Then
 			WriteLog(MSUpdate(1, i) & " " & MSUpdate(2, i) & " " & MSUpdate(3, i))
 			For Each objItem in colItems
@@ -315,7 +326,7 @@ End Sub
 Sub InstallMSUpdates()
 	WriteLog("Start upgrade")
 	Dim i, CodeInstallMSUpdate, PatchMSUpdate, FullPatchMSUpdate
-	For i = 1 To UBound(MSUpdate,1)  Step 1
+	For i = 1 To UBound(MSUpdate,2)  Step 1
 		If MSUpdate(2, i) = OSVersion Then
 			If OSVersion = "7" Then
 				PatchMSUpdate = strShare & "\KB\" & OSVersion & "-" & MSUpdate(1, i) & "-" & OSArch & ".msu"
@@ -327,7 +338,7 @@ Sub InstallMSUpdates()
 			End If
 			If MSUpdate(3, i) = 0 Then
 				If CheckPathFile(PatchMSUpdate) = 1 Then
-					FullPatchMSUpdate = PatchMSUpdate & " /quiet /norestart /log:" & PathFullFileLog & ".evt"
+					FullPatchMSUpdate = PatchMSUpdate & " /quiet /norestart /log:" & PathFullFileLog & sTime & "_" & sDate & ".evt"
 					WriteLog(FullPatchMSUpdate)
 					CodeInstallMSUpdate = WshShell.Run(FullPatchMSUpdate, 1, True)
 					WriteLog ("Обработка завершена! Код возврата - " & CodeInstallMSUpdate)
@@ -340,4 +351,4 @@ Sub InstallMSUpdates()
 	WriteLog("Finish upgrade")
 End Sub
 
-WScript.Quit 0
+'WScript.Quit 0
