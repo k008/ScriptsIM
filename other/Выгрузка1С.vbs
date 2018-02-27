@@ -11,7 +11,7 @@ Elenka="Elenka"
 Eva="Eva"
 MAXI="MAXI"
 NAINA="NAINA"
-Svetlana="Svetlana"
+Svetlana="Sveta"
 
 Elenka1C="\\" & Elenka & "\1c\"
 Eva1C="\\" & Eva & "\1c\"
