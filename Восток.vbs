@@ -1,5 +1,5 @@
 Option explicit
-On Error Resume Next
+'On Error Resume Next
 Dim FSO,Sep,FDir,FLD,ArrayInp,FF,FL,St
 Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfSum,dbfConn,ZV,WSHShell,ErrC

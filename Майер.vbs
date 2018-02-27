@@ -39,13 +39,16 @@ For Each FF in FL
   
   Sep = ";"
   
-  dbfPrice.Open "SELECT * FROM " &TableName ' װאיכ
-  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM " &TableName ' װאיכ (נאסקוע סףללû)
-  DeviceOut.WriteLine TableName&Sep &FF.DateLastModified& Sep & dbfSum("Summ")
+  dbfPrice.Open "SELECT * FROM "&TableName
+  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM "&TableName
+  St="ֿׂ-" & Mid(dbfPrice.Fields("INVNUMBER"),8) & Sep & dbfPrice.Fields("INVDATE") & Sep & dbfSum("Summ")
+  'St=Convert866to1251(St)
+  
+  DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
   
     Do While Not dbfPrice.Eof
-	   St=dbfPrice("KOD") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("PROIZV") & Sep & dbfPrice.Fields("COUNTRY") & Sep & dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("CENACNDS") & Sep & dbfPrice.Fields("CENABNDS") & Sep & dbfPrice.Fields("CENABNDS") & Sep & Sep & Sep & Sep & dbfPrice.Fields("N_DECLAR") & Sep &  dbfPrice.Fields("SERTIF") & "^" & dbfPrice.Fields("DATAEND") & "^" & dbfPrice.Fields("CERTORG") & Sep & dbfPrice.Fields("SERII") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("SHTRIHKOD") & Sep & Sep & dbfPrice.Fields("REESTR") & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & ""
+	   St=dbfPrice("KOD") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("PROIZV") & Sep & dbfPrice.Fields("COUNTRY") & Sep & dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("CENACNDS") & Sep & dbfPrice.Fields("CENABNDS") & Sep & dbfPrice.Fields("CENABNDS") & Sep & Sep & Sep & Sep & dbfPrice.Fields("N_DECLAR") & Sep &  dbfPrice.Fields("SERTIF") & "^" & dbfPrice.Fields("DATAEND") & "^" & dbfPrice.Fields("CERTORG") & Sep & dbfPrice.Fields("SERII") & Sep & Sep & dbfPrice.Fields("SERIISROK") & Sep & dbfPrice.Fields("SHTRIHKOD") & Sep & Sep & dbfPrice.Fields("REESTR") & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & ""
           if Err.Number<>0 then Exit Do
 	  dbfPrice.MoveNext
           St=Convert866to1251(St)

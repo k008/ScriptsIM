@@ -8,8 +8,8 @@ ReDim ConvTable(1)
 Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255"
 Const TT="192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,63,63,63,166,63,63,63,63,63,63,63,63,63,63,63,172,63,63,63,63,63,134,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,63,135,63,63,63,63,63,63,63,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,168,184,170,186,175,191,161,162,176,149,183,63,185,164,152,160"
 Const InExt="dbf"
-Const OutExt="sso"
-Const OutPath="X:\Programs\in\"
+Const OutExt="srn"
+Const OutPath="X:\Programs\In\"
 
 Set FSO = CreateObject("Scripting.FileSystemObject")
 FDir="C:\Mail\Invoice\"&Mid(WScript.ScriptName,1,InStr(LCase(WScript.ScriptName),".vbs")-1)&"\"
@@ -22,7 +22,6 @@ For Each FF in FL
  if InStr(LCase(FF.Name),"."&InExt) then
 
   TableName=Mid(LCase(FF.Name),1,InStr(LCase(FF.Name),"."&InExt)-1)
-  CheckLenTableName()
   Set DeviceOut = FSO.CreateTextFile(FDir&"\"&TableName&"."&OutExt, True)
   Set dbfConn = CreateObject("ADODB.Connection")
   With dbfConn
@@ -43,15 +42,17 @@ For Each FF in FL
   Sep = ";"
 
   dbfPrice.Open "SELECT * FROM "&TableName
-  dbfSum.Open "SELECT Sum(SUMMA) AS Summ FROM "&TableName
-  St=dbfPrice.Fields("N_DOC") & Sep & dbfPrice.Fields("DATA_DOC") & Sep & dbfSum("Summ")
-  'St=Convert866to1251(St)
+  dbfSum.Open "SELECT Sum(SUMSNDSP) AS Summ FROM "&TableName
+  St=(Mid(dbfPrice.Fields("NUMBERN"),3,Len(dbfPrice.Fields("NUMBERN")))+0) & Sep & dbfPrice.Fields("DATAN") & Sep & dbfSum("Summ")
+  'St=dbfPrice.Fields("NUMBERN") & Sep & dbfPrice.Fields("DATAN) & Sep & dbfSum("Summ")
+  St=Convert866to1251(St)
+  
   DeviceOut.WriteLine St
   DeviceOut.WriteLine "[Body]"
       
     Do While Not dbfPrice.Eof
-	  St = dbfPrice("KODTOV") & Sep & dbfPrice.Fields("NAMETOV") & Sep & dbfPrice.Fields("PROIZ") & Sep & Sep &dbfPrice.Fields("KOLVO") & Sep & dbfPrice.Fields("SUMMA")/(dbfPrice.Fields("KOLVO")) & Sep & Sep & dbfPrice.Fields("CENABEZNDS") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("REGN") & Sep & Sep & Sep & dbfPrice.Fields("SROK") & Sep & Sep & Sep & Sep & Sep & dbfPrice.Fields("SUMMA") & Sep & ""
-          'St=Convert866to1251(St)
+	  St = dbfPrice("CODE") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("PROIZV") & Sep & dbfPrice.Fields("COUNTRY") & Sep &dbfPrice.Fields("KOL") & Sep & dbfPrice.Fields("PRPSNDS") & Sep & Sep & dbfPrice.Fields("PRPSNDS")-((dbfPrice.Fields("PRPSNDS"))*((dbfPrice.Fields("NDSPER"))/(dbfPrice.Fields("NDSPER")+100))) & Sep & Sep & Sep & Sep & dbfPrice.Fields("GTD") & Sep & ReplaceStr(ReplaceStr(dbfPrice.Fields("SERT"),Chr(13),""),Chr(10)," ") & "^" & Sep & Sep & Sep & dbfPrice.Fields("SROKG") & Sep & dbfPrice.Fields("SCODE") & Sep & Sep & Sep & Sep & dbfPrice.Fields("SUMSNDSP") & Sep & ""
+          St=Convert866to1251(St)
           DeviceOut.WriteLine(St)
 	  dbfPrice.MoveNext
           if Err.Number then Exit Do 
@@ -126,15 +127,15 @@ Function Convert866to1251(St)
 End Function
 
 Function CopyFiles()
-  Set FL = FLD.Files
-  For Each FF in FL
-    if InStr(LCase(FF.Name),"."&OutExt) then
-      FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
-      FSO.DeleteFile FDir&FF.Name
-    else
-      FSO.DeleteFile FDir&FF.Name
-    end if
-  Next
+Set FL = FLD.Files
+For Each FF in FL
+  if InStr(LCase(FF.Name),"."&OutExt) then
+    FSO.CopyFile FDir&FF.Name, OutPath&FF.Name
+    FSO.DeleteFile FDir&FF.Name
+  else
+    FSO.DeleteFile FDir&FF.Name
+  end if
+Next
 End Function
 
 Function ReplaceStr(Val,Old,NStr)
@@ -143,50 +144,4 @@ Function ReplaceStr(Val,Old,NStr)
   else
     ReplaceStr=Replace(Val,Old,NStr)
   end if
-End Function
-
-Function DelBigName(LR)
-  Dim FFNew, i
-	If LR = "L" Then
-		TableName=Left(TableName, 7)
-	End If
-	If LR = "R" Then
-		TableName=Right(TableName, 7)
-	End If
-    
-	FFNew=FDir & TableName & ".dbf"
-    If CheckPath(FFNew) = 1 Then
-      For i=97 To 122
-        If CheckPath(FDir & TableName & chr(i) & ".dbf") = 0 Then
-          TableName = TableName & chr(i)
-          FFNew=FDir & TableName & ".dbf"
-          Exit For
-        End If
-      Next
-    End If
-      
-  'msgbox(FF & "--" & FFNew)
-  FF.Move (FFNew) 
-  'msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbg'")
-  'msgbox(TableName)
-End Function
-
-Function CheckLenTableName()
-  If Len(TableName)>8 Then
-    DelBigName("L")
-  End If
-  
-  If Len(TableName)>8 Then
-    msgbox ("Необходимо уменьшить имя накладной до 8-ми символов перед '.dbf'. Количество символов=" & Len(TableName) & Chr(13)&Chr(10) & "Будет крах, звонить 911 с корпоративного телефона")
-  End If
-End Function
-
-Function CheckPath(Path)
-  If FSO.FileExists(Path) Then
-    CheckPath=1
-  End If
-  
-  If Not FSO.FileExists(Path) Then
-    CheckPath=0
-  End If
 End Function

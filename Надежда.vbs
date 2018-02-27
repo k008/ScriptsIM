@@ -60,7 +60,7 @@ For Each FF in FL
   
   ZV = 0
   dbfPrice.Open "SELECT * FROM ["&TableName&"]"  'файл с накладной
-  St=dbfPrice.Fields("NUMORD") & Sep & dbfPrice.Fields("ORDERDATE") & Sep & dbfPrice.Fields("SUMALL")
+  St="K" & dbfPrice.Fields("NUMORD") & Sep & dbfPrice.Fields("ORDERDATE") & Sep & dbfPrice.Fields("SUMALL")
     St=Convert866to1251(St)
     DeviceOut.WriteLine St
     DeviceOut.WriteLine "[Body]"

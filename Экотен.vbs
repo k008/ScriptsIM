@@ -3,6 +3,7 @@ Option explicit
 Dim FSO,Sep,FDir,FLD,ArrayInp,FF,FL,St
 Dim DeviceInp,DeviceOut
 Dim TableName,dbfPrice,dbfSum,dbfConn,ErrC,WSHShell
+Dim Pb1, Pb2, Pb3, Pb4, Pb5, Pb6, Pb7, Pb8, Pb9, Pb10, Pb11, Pb12, Pb13, Pb14, Pb15, Pb16, Pb17, Pb18, Pb19, Pb20, Pb21, Pb22
 
 ReDim ConvTable(1)
 Const TF="128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255"
@@ -42,21 +43,51 @@ For Each FF in FL
     Sep = ";"
     
   dbfPrice.Open "SELECT * FROM ["&TableName&"]"  'файл с накладной
-  dbfSum.Open "SELECT Sum(PRICE2*QNT) AS Summ FROM ["&TableName&"]"
-  St=Mid(dbfPrice.Fields("NDOC"),7) & Sep & dbfPrice.Fields("DATEDOC") & Sep & dbfSum("Summ")
+  'dbfSum.Open "SELECT Sum(PRICE2*QNT) AS Summ FROM ["&TableName&"]"
+  St=dbfPrice.Fields("DOCNUM") & Sep & dbfPrice.Fields("DOCDATE") & Sep & dbfPrice.Fields("AMSUMWNDS")
   St=Convert866to1251(St)
   DeviceOut.WriteLine(St)
   DeviceOut.WriteLine "[Body]"
   
   'dbfPrice.MoveNext
   
-    Do While Not dbfPrice.Eof
-   St=dbfPrice.Fields("CODEPST") & Sep & dbfPrice.Fields("NAME") & Sep & dbfPrice.Fields("FIRM") & Sep & dbfPrice.Fields("CNTR") & Sep &dbfPrice.Fields("QNT") & Sep & dbfPrice.Fields("PRICE1") & Sep & Sep & dbfPrice.Fields("PRICE2N") & Sep & Sep & dbfPrice.Fields("NDS") &Sep & Sep & dbfPrice.Fields("NUMGTD") & Sep & dbfPrice.Fields("SERTIF") & Sep & dbfPrice.Fields("SER") & Sep & Sep & dbfPrice.Fields("GDATE") & Sep & dbfPrice.Fields("EAN13") & Sep & Sep & Sep & Sep & dbfPrice.Fields("PRICE2")*dbfPrice.Fields("QNT") & Sep & Sep
-      if Err.Number then Exit Do 
-      St=Convert866to1251(St)
-	  DeviceOut.WriteLine (St)
+ Do While Not dbfPrice.Eof
+    Pb1=dbfPrice.Fields("CODE")
+    Pb2=dbfPrice.Fields("NAME")
+    Pb3=dbfPrice.Fields("MNAME")
+    Pb4=dbfPrice.Fields("MCOUNTRY")
+    Pb5=dbfPrice.Fields("QTY")
+    Pb6=dbfPrice.Fields("PPRWNDS")
+    Pb7=""'dbfPrice.Fields("PRPROD")
+    Pb8=dbfPrice.Fields("PPRWONDS")
+    Pb9=""
+    Pb10=""'dbfPrice.Fields("PROCNDS")
+    Pb11=""
+    Pb12=dbfPrice.Fields("GTDNUM")
+    Pb13=dbfPrice.Fields("RCNUM") & "^" & dbfPrice.Fields("SERTNUM") & "^" & dbfPrice.Fields("SERTORG") & "^" & dbfPrice.Fields("SERTBDATE") & "^" & dbfPrice.Fields("SERTEDATE")
+    Pb14="" 'dbfPrice.Fields("Series")
+    Pb15=""
+    Pb16=dbfPrice.Fields("SERVDATE")
+    Pb17=dbfPrice.Fields("PEAN13")
+    Pb18=""'dbfPrice.Fields("DATEISSUE")
+    Pb19=""'dbfPrice.Fields("REESTR")
+    Pb20=""
+    Pb21=dbfPrice.Fields("PPRWNDS") * Pb5
+    Pb22=""'dbfPrice.Fields("JNVLS")
+    'msgbox(pb2 & " t=" & TableName)
+    If Pb2 <> TableName Then
+      St=Pb1 & Sep & Pb2 & Sep & Pb3 & Sep & Pb4 & Sep &_
+  	        Pb5 & Sep & Pb6 & Sep & Pb7 & Sep & Pb8 & Sep &_
+		Pb9 & Sep & Pb10 & Sep & Pb11 & Sep & Pb12 & Sep & Pb13 & Sep & Pb14 & Sep & Pb15 & Sep & Pb16 & Sep & Pb17 & Sep & Pb18 & Sep & Pb19 & Sep & Pb20 & Sep & Pb21 & Sep & Pb22
+    else
+      St=""
+    End If
 	  dbfPrice.MoveNext
-          if Err.Number then Exit Do
+      If Err.Number Then Exit Do 
+      St=Convert866to1251(St)
+      If St<>"" Then
+        DeviceOut.WriteLine(St)
+      End If
     Loop
      
    dbfConn.Close

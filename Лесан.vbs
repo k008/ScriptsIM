@@ -13,25 +13,24 @@ FDir=ArrayInp(0)
 Set FLD = FSO.GetFolder(FDir)
 Set FL = FLD.Files
 
-For Each FF in FL 'Смотрим все файлы и убираем год
- if InStr(LCase(FF.Name),"."&InExt) then
-   if InStr(FF.Name,Year(Now)) then
-     FSO.CopyFile FDir&FF.Name, FDir&Mid(FF.Name,InStr(FF.Name,Year(Now))+Len(Year(Now)),Len(FF.Name))
-     FSO.DeleteFile FDir&FF.Name
-   end if
- end if
-next
+'For Each FF in FL 'Смотрим все файлы и убираем год
+ 'if InStr(LCase(FF.Name),"."&InExt) then
+   'if InStr(FF.Name,Year(Now)) then
+     'FSO.CopyFile FDir&FF.Name, FDir&Mid(FF.Name,InStr(FF.Name,Year(Now))+Len(Year(Now)),Len(FF.Name))
+     'FSO.DeleteFile FDir&FF.Name
+   'end if
+ 'end if
+'next
 Set FLD = Nothing
 SET FL = Nothing
 Set FLD = FSO.GetFolder(FDir)
 Set FL = FLD.Files
 
 For Each FF in FL
- if InStr(LCase(FF.Name),"."&InExt) AND (FF.Size<50000) then
+ if InStr(LCase(FF.Name),"."&InExt) AND (FF.Size<60000) then
 
   TableName=Mid(LCase(FF.Name),1,InStr(LCase(FF.Name),"."&InExt)-1)
   Set dbfConn = CreateObject("ADODB.Connection")
-  
   With dbfConn
     .Provider = "Microsoft.Jet.OLEDB.4.0"
     .Properties("Extended Properties") = "dBase IV"
