@@ -11,8 +11,8 @@ Dim arCEStart() 'массив записи в файл
 Dim strComputerName, strShare, iPing
 Set FSO = CreateObject("Scripting.FileSystemObject")
 
-ScriptName = "1С-line"
-ver = "0.1.2"
+ScriptName = "1C-links"
+ver = "0.1.3" ' Отключено создание ссылок
 PathFileLog = ScriptName & ".log"
 Dir = EnvironmentVariables("%TEMP%") & "\"
 PathFullFileLog = Dir & PathFileLog
@@ -24,7 +24,7 @@ stribasesexists=0
 
 
 strComputerName = "192.168.19.3"
-strShare    = "\\" & strComputerName & "\install\testlinks"
+strShare    = "\\" & strComputerName & "\links"
 
 
 WriteLog("                    ")
@@ -59,6 +59,7 @@ Sub Main
 	Else
 		WriteLog("Сравнение баз не выполнено")
 	End If
+	msgbox "Настройка 1С закончена"
 End Sub
 
 
@@ -632,9 +633,9 @@ Sub createlink (cllink, conSRV, cdbase, clNamebase) 'Имя раздела бр�
 			NewFileText = clNamebase & vbcrlf & "Connect=Srvr=" & conSRV & ";Ref=""" & cdbase & """;" & vbcrlf & "ClientConnectionSpeed=Normal" & vbcrlf & "App=Auto" & vbcrlf & "WA=1"
 			'NewFile = GenerateFileName(EnvironmentVariables("%APPDATA%")) & "\" & FSO.GetFileName(cllink)
 			'CreateFile NewFile
-			CreateFile cllink
+			'CreateFile cllink
 			bom=bomreadv8i
-			Writeaddbase NewFileText, cllink
+			'Writeaddbase NewFileText, cllink
 			'FSO.CopyFile NewFile, cllink
 			'msgbox FSO.GetAbsolutePathName(NewFile) & vbcrlf & NewFile
 		End If
