@@ -9,6 +9,7 @@ Dim ibases(199,4), ibasesi
 Dim CEStart(199,1), CEStarti
 Dim arCEStart() 'массив записи в файл
 Dim strComputerName, strShare, iPing
+Dim fileCEStart
 Set FSO = CreateObject("Scripting.FileSystemObject")
 
 ScriptName = "1C-links"
@@ -21,7 +22,7 @@ stribases = "1C\1CEStart\ibases.v8i"
 str1CEStart = "1C\1CEStart\1CEStart.cfg"
 str1CEStartexists=0
 stribasesexists=0
-
+fileCEStart=""
 
 strComputerName = "192.168.19.3"
 strShare    = "\\" & strComputerName & "\links"
@@ -474,7 +475,7 @@ Sub SravnenieBases() 'сравнение ibases и 1CEStart, на наличие
 		End If
 	Next
 	If allowadd=1 Then 'addlinkbase
-		call addbase()
+		call addbase2()
 		allowdel=1
 	End If
 	
@@ -522,6 +523,7 @@ Sub addbase()
 	notadd=0
 	'arCEStart-массив для записи в файл
 	ReDim Preserve arCEStart(j)
+
 	For i=0 to ubound (Read1cefilesplit)
 	'readfilesplit(i) = "CommonInfoBases="
 		If instr(1, Read1cefilesplit(i), "CommonInfoBases=") > 0 Then 'правильный поиск CommonInfoBases+
@@ -685,4 +687,53 @@ Sub Writeaddbase(WriteFile, filename)
 			WriteLog "ASCII" & " bom=" & bom
 	End Select
 	WriteLog("//Writeaddbase")
+End Sub
+
+Sub addbase2()
+	Dim fileCEStartwrite
+	call addbasefile()
+	If fileCEStart <> "" Then 
+		fileCEStartwrite=fileCEStart & arraytofile(Read1cefilesplit)
+		bom=bomread1ce
+		Writeaddbase fileCEStartwrite, EnvironmentVariables("%APPDATA%") & "\" & str1CEStart
+	End If
+End Sub
+
+
+
+Sub addbasefile()
+	Dim k, l, notadd, allowadd
+	k=0
+	notadd=0
+	
+	If k=0 Then 'Необходимо не допустить повторное выполнение цикла
+		For k=0 to ubound(ibases)
+			If ibases(k, 4) = "add" Then
+				For l=0 to ubound(ibases) 'перебор на наличие одинаковой базы
+					If ibases(k, 4) = "add" And ibases(l, 4) = "added" And ibases(k, 2) = ibases(l, 2) & ibases(k, 1) = ibases(l, 1) Then
+						WriteLog("Не будет добавлена база:" & " " & ibases(k, 0) & " " & ibases(k, 2) & "=" & ibases(l, 0) & " " & ibases(l, 2))
+						notadd=notadd+1
+					End If
+				Next
+				If notadd=0 Then
+					allowadd=1
+					'Имя и порт
+					If ibases(k, 1) = """servertsdata""" Or ibases(k, 1) = """192.168.19.3""" Or ibases(k, 1) = """servertsdata:2541""" Or ibases(k, 1) = """192.168.19.3:2541""" Then
+						fileCEStart = fileCEStart & "CommonInfoBases=" & strShare & "\" & ibases(k, 2) & ".v8i" & vbCrlf
+						'notadd=0' ?
+						ibases(k, 4) = "added"
+						WriteLog("Добавление ссылки на сервер")
+						createlink strShare & "\" & ibases(k, 2) & ".v8i", ibases(k, 1), ibases(k, 2), ibases(k, 0)
+					Else
+						fileCEStart = fileCEStart & "CommonInfoBases=" & strShare & "\" & ibases(k, 2) & "-" & replace(replace(ibases(k, 1),":","_"), """", "") & ".v8i" & vbCrlf
+						'notadd=0' ?
+						ibases(k, 4) = "added"
+						WriteLog("Добавление ссылки на сервер:" & strShare & "\" & ibases(k, 2) & "-" & replace(replace(ibases(k, 1),":","_"), """", "") & ".v8i")
+						createlink strShare & "\" & ibases(k, 2) & "-" & replace(replace(ibases(k, 1),":","_"), """", "") & ".v8i", ibases(k, 1), ibases(k, 2), ibases(k, 0)
+					End If
+				End If
+			End If
+			notadd=0
+		Next
+	End If
 End Sub
