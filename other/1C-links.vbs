@@ -12,7 +12,7 @@ Dim strComputerName, strShare, iPing
 Set FSO = CreateObject("Scripting.FileSystemObject")
 
 ScriptName = "1C-links"
-ver = "0.1.3" ' Отключено создание ссылок
+ver = "0.1.4" ' Отключено создание ссылок, проверка размера файла
 PathFileLog = ScriptName & ".log"
 Dir = EnvironmentVariables("%TEMP%") & "\"
 PathFullFileLog = Dir & PathFileLog
@@ -282,7 +282,7 @@ End Sub
 'Чтение 1C files
 Function ReadFile(filename)
 	WriteLog "ReadFile " & filename
-	Dim fso1, f, bomtab, stream
+	Dim fso1, f, bomtab, stream, gfsize
 	Set fso1 = CreateObject("Scripting.FileSystemObject")
 	
 	bom = ""
@@ -291,30 +291,42 @@ Function ReadFile(filename)
 		bom = bom & f.Read(1)
 	Loop
 	f.Close
-
+	Set f = fso1.OpenTextFile(filename, 1, False, -1)
+	Set gfsize=fso1.GetFile(filename)
 	Select Case bom
 		Case "y?", "?y", "яю"  'UTF-16 text
-			Set f = fso1.OpenTextFile(filename, 1, False, -1)
-			ReadFile = f.ReadAll
-			f.Close
-			bomtab=2
-			WriteLog "UTF-16" & " bom=" & bom
+			If gfsize.Size > 3 Then
+				ReadFile = f.ReadAll
+				f.Close
+				bomtab=2
+				WriteLog "UTF-16" & " bom=" & bom
+			Else 
+				WriteLog "Файл пустой"
+			End If
 		Case "i»?", "п»ї"       'UTF-8 text
-			Set stream = CreateObject("ADODB.Stream")
-			stream.Open
-			stream.Type = 2
-			stream.Charset = "utf-8"
-			stream.LoadFromFile filename
-			ReadFile = stream.ReadText
-			stream.Close
-			bomtab=3
-			WriteLog "UTF-8" & " bom=" & bom
+			If gfsize.Size > 4 Then
+				Set stream = CreateObject("ADODB.Stream")
+				stream.Open
+				stream.Type = 2
+				stream.Charset = "utf-8"
+				stream.LoadFromFile filename
+				ReadFile = stream.ReadText
+				stream.Close
+				bomtab=3
+				WriteLog "UTF-8" & " bom=" & bom
+			Else 
+				WriteLog "Файл пустой"
+			End If
 		Case Else        'ASCII text
-			Set f = fso.OpenTextFile(filename, 1, False, 0)
-			ReadFile = f.ReadAll
-			f.Close
-			bomtab=0
-			WriteLog "ASCII" & " bom=" & bom
+			If gfsize.Size > 4 Then
+				Set f = fso.OpenTextFile(filename, 1, False, 0)
+				ReadFile = f.ReadAll
+				f.Close
+				bomtab=0
+				WriteLog "ASCII" & " bom=" & bom
+			Else 
+				WriteLog "Файл пустой"
+			End If
 	End Select
 
 	WriteLog ReadFile
