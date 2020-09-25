@@ -12,7 +12,7 @@ Dim strComputerName, strShare, iPing
 Set FSO = CreateObject("Scripting.FileSystemObject")
 
 ScriptName = "1С-line"
-ver = "0.1.1"
+ver = "0.1.2"
 PathFileLog = ScriptName & ".log"
 Dir = EnvironmentVariables("%TEMP%") & "\"
 PathFullFileLog = Dir & PathFileLog
@@ -51,11 +51,11 @@ Sub Main
 	str1CEStartexists = FileExist (EnvironmentVariables("%APPDATA%") & "\" & str1CEStart)
 	If str1CEStartexists = 1 Then
 		CopyFiles EnvironmentVariables("%APPDATA%") & "\" & str1CEStart
-		'call Read1ce
+		call Read1ce
 	End If
 	'Call TestServerLinks
 	If stribasesexists = 1 And str1CEStartexists Then
-		'call SravnenieBases
+		call SravnenieBases
 	Else
 		WriteLog("Сравнение баз не выполнено")
 	End If
@@ -218,10 +218,11 @@ Sub Readv8i()
 			If instrsrvbase > 0 Then
 				instrsrvsep2=instr(instrsrvbase, Readv8ifilesplit(i), ";")
 				'От = и до конца строки, если последний ;-убрать, если нет "- то добавить
-				'msgbox mid(Readv8ifilesplit(i), instrsrvbase+4, instrsrvsep2-instrsrvbase-4)
-				'WriteLog mid(Readv8ifilesplit(i), instrsrvbase+4, instrsrvsep2-instrsrvbase-4)
+				'msgbox instrsrvsep2
+				'WriteLog Readv8ifilesplit(i) & " " & instrsrvbase+4 & " " & instrsrvsep2-instrsrvbase-4
 				'ibases(ibasesi,2) = mid(Readv8ifilesplit(i), instrsrvbase+4, instrsrvsep2-instrsrvbase-4)
-				ibases(ibasesi,2) = mid(Readv8ifilesplit(i), instrsrvbase+4, instrsrvsep2-4)
+				'msgbox "string=" & Readv8ifilesplit(i) & vbcrlf & "Ref=" & instrsrvbase & " Len=" & Len(Readv8ifilesplit(i))
+				ibases(ibasesi,2) = mid(Readv8ifilesplit(i), instrsrvbase+4, Len(Readv8ifilesplit(i))-instrsrvbase-4)
 				If mid(ibases(ibasesi,2),1,1)="""" Then
 					ibases(ibasesi,2)=mid(ibases(ibasesi,2), 2, Len(ibases(ibasesi,2))-1)
 				End If
@@ -452,7 +453,7 @@ Sub SravnenieBases() 'сравнение ibases и 1CEStart, на наличие
 					End If
 				Next
 				If addlinkbase=1 Then 'Если база не была найдена в ссылках, то добавлям ссылку 'allowadd
-					WriteLog ("Не найдена база в 1CEStart.cfg:" & ibases(i,2))
+					WriteLog ("Не найдена база в 1CEStart.cfg:" & ibases(i,0) & " " & ibases(i,1) &  " " & ibases(i,2))
 					ibases(i,4) = "add"
 					allowadd=1
 				End If
@@ -519,8 +520,8 @@ Sub addbase()
 				For k=0 to ubound(ibases)
 					If ibases(k, 4) = "add" Then
 						For l=0 to ubound(ibases) 'перебор на наличие одинаковой базы
-							If ibases(k, 4) = "add" And ibases(l, 4) = "added" And ibases(k, 2) = ibases(l, 2) Then
-								WriteLog("Не будет добавлена база:" & ibases(k, 2))
+							If ibases(k, 4) = "add" And ibases(l, 4) = "added" And ibases(k, 2) = ibases(l, 2) & ibases(k, 1) = ibases(l, 1) Then
+								WriteLog("Не будет добавлена база:" & " " & ibases(k, 0) & " " & ibases(k, 2) & "=" & ibases(l, 0) & " " & ibases(l, 2))
 								notadd=notadd+1
 							End If
 						Next
@@ -590,6 +591,7 @@ Sub removebase()
 			ibases(i,4) = "deleted"
 		End If
 	Next
+	bom=bomreadv8i
 	Writeaddbase arraytofile(Readv8ifilesplit), EnvironmentVariables("%APPDATA%") & "\" & stribases
 	WriteLog("removebase")
 End Sub
@@ -627,7 +629,7 @@ Sub createlink (cllink, conSRV, cdbase, clNamebase) 'Имя раздела бр�
 			WriteLog("Ссылка существует:" & cllink)
 		Else
 			WriteLog("Создаётся ссылка:" & cllink)
-			NewFileText = clNamebase & vbcrlf & "Connect=Srvr=" & conSRV & ";Ref=""" & cdbase & """" & vbcrlf & "ClientConnectionSpeed=Normal" & vbcrlf & "App=Auto" & vbcrlf & "WA=1"
+			NewFileText = clNamebase & vbcrlf & "Connect=Srvr=" & conSRV & ";Ref=""" & cdbase & """;" & vbcrlf & "ClientConnectionSpeed=Normal" & vbcrlf & "App=Auto" & vbcrlf & "WA=1"
 			'NewFile = GenerateFileName(EnvironmentVariables("%APPDATA%")) & "\" & FSO.GetFileName(cllink)
 			'CreateFile NewFile
 			CreateFile cllink
@@ -637,7 +639,7 @@ Sub createlink (cllink, conSRV, cdbase, clNamebase) 'Имя раздела бр�
 			'msgbox FSO.GetAbsolutePathName(NewFile) & vbcrlf & NewFile
 		End If
 	End If
-	WriteLog("createlink")
+	WriteLog("//createlink")
 End Sub
 
 'Выполнить запись в 1C files
@@ -653,6 +655,7 @@ Sub Writeaddbase(WriteFile, filename)
 			Set f = fso1.OpenTextFile(filename, 2, True, -1)'do not create-False
 			f.Write WriteFile
 			f.Close
+			WriteLog "UTF-16" & " bom=" & bom
 		Case "i»?", "п»ї"       'UTF-8 text
 			Set stream = CreateObject("ADODB.Stream")
 			stream.Type = 2
@@ -661,9 +664,12 @@ Sub Writeaddbase(WriteFile, filename)
 			stream.WriteText WriteFile
 			stream.SaveToFile filename, 2
 			stream.Close
+			WriteLog "UTF-8" & " bom=" & bom
 		Case Else        'ASCII text
 			Set f = fso.OpenTextFile(filename, 2, True, 0)
 			f.Write WriteFile
 			f.Close
+			WriteLog "ASCII" & " bom=" & bom
 	End Select
+	WriteLog("//Writeaddbase")
 End Sub
